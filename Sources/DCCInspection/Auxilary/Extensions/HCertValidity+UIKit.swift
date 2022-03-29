@@ -96,7 +96,7 @@ public extension HCertValidity {
             return NSImage(named: "error")!
         case .ruleInvalid:
             return NSImage(named: "check")!
-        case .revocated:
+        case .revoked:
             return NSImage(named: "error")!
         }
     }
@@ -108,7 +108,7 @@ public extension HCertValidity {
             return .red
         case .ruleInvalid:
             return .yellow
-        case .revocated:
+        case .revoked:
             return .red
         }
     }

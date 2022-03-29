@@ -25,27 +25,23 @@
 //  Created by Yannick Spreen on 4/24/21.
 //  
 
-#if os(iOS)
-import UIKit
-#else
-import AppKit
-#endif
+import Foundation
 import Alamofire
 import DGCCoreLibrary
 import SwiftyJSON
 import CertLogic
 
 enum GatewayError: Error {
-    case insufficientData
-    case encodingError
-    case signingError
-    case updatingError
-    case incorrectDataResponse
-    case connection(error: Error)
-    case local(description: String)
-    case parsingError
-    case privateKeyError
-    case tokenError
+  case insufficientData
+  case encodingError
+  case signingError
+  case updatingError
+  case incorrectDataResponse
+  case connection(error: Error)
+  case local(description: String)
+  case parsingError
+  case privateKeyError
+  case tokenError
 }
 
 typealias GatewayCompletion = (GatewayError?) -> Void
@@ -66,9 +62,10 @@ class GatewayConnection: ContextConnection {
         }
         request( ["endpoints", "update"], method: .get, encoding: URLEncoding(), headers: .init(headers)).response {
             if let status = $0.response?.statusCode, status == 204 {
-                completion(nil, nil, GatewayError.parsingError)
+                completion(nil, nil, nil)
                 return
             }
+
             guard case let .success(result) = $0.result,
                   let response = result,
                   let responseStr = String(data: response, encoding: .utf8),
@@ -79,6 +76,7 @@ class GatewayConnection: ContextConnection {
                 completion(nil, nil, GatewayError.parsingError)
                 return
             }
+
             let kid = KID.from(responseStr)
             let kidStr = KID.string(from: kid)
             if kidStr != responseKid {
@@ -153,10 +151,10 @@ class GatewayConnection: ContextConnection {
             DCCDataCenter.lastFetch = Date()
             DCCDataCenter.saveLocalData { result in
                 if DCCDataCenter.localDataManager.versionedConfig["outdated"].bool == true {
-                    DispatchQueue.main.async {
-                      (UIApplication.shared.windows.first?.rootViewController as? UINavigationController)?
-                          .popToRootViewController(animated: false)
-                    }
+//                    DispatchQueue.main.async {
+//                      (UIApplication.shared.windows.first?.rootViewController as? UINavigationController)?
+//                          .popToRootViewController(animated: false)
+//                    }
                 }
                 completion()
             }
