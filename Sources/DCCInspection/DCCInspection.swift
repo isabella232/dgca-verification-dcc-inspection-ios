@@ -31,7 +31,7 @@ import UIKit
 import AppKit
 #endif
 
-import CoreLibrary
+import DGCCoreLibrary
 
 public final class DCCInspection: CertificateInspection {
     

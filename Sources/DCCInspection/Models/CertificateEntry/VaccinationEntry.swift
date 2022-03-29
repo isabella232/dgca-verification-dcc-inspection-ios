@@ -26,7 +26,7 @@
 
 import Foundation
 import SwiftyJSON
-import CoreLibrary
+import DGCCoreLibrary
 
 public struct VaccinationEntry: HCertEntry {
     public var typeAddon: String {

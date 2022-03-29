@@ -27,7 +27,7 @@
         
 
 import Foundation
-import CoreLibrary
+import DGCCoreLibrary
 import CertLogic
 
 class DCCDataCenter {

@@ -31,7 +31,7 @@ import UIKit
 import AppKit
 #endif
 import Alamofire
-import CoreLibrary
+import DGCCoreLibrary
 import SwiftyJSON
 import CertLogic
 

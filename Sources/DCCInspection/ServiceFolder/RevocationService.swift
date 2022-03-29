@@ -26,7 +26,7 @@
 //
 
 import Foundation
-import CoreLibrary
+import DGCCoreLibrary
 
 public enum RevocationError: Error {
     case unauthorized // TODO - add  unauthorized(error: NSError?)

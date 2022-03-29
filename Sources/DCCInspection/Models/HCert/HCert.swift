@@ -28,7 +28,7 @@ import Foundation
 import SwiftyJSON
 import JSONSchema
 import SwiftCBOR
-import CoreLibrary
+import DGCCoreLibrary
 
 public class HCert: Codable {
     public let fullPayloadString: String

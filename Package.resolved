@@ -65,11 +65,11 @@
         }
       },
       {
-        "package": "CoreLibrary",
+        "package": "DGCCoreLibrary",
         "repositoryURL": "https://github.com/eu-digital-green-certificates/dgca-verification-core-library.git",
         "state": {
           "branch": "main",
-          "revision": "ba9b8897dd2bce56812caba10d7f3f0e8171bae5",
+          "revision": "7de7cfe6eb535cf99098ba9531f7dbeb5041d21d",
           "version": null
         }
       },

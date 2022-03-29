@@ -27,7 +27,7 @@
 
 import Foundation
 import SwiftyJSON
-import CoreLibrary
+import DGCCoreLibrary
 
 enum TestResult: String {
     case detected = "260373001"

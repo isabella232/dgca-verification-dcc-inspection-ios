@@ -26,7 +26,7 @@
 
 import Foundation
 import Alamofire
-import CoreLibrary
+import DGCCoreLibrary
 
 public class CertEvaluator: ServerTrustEvaluating {
   class CertError: Error {}

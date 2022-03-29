@@ -26,7 +26,7 @@
 //
 
 import Foundation
-import CoreLibrary
+import DGCCoreLibrary
 import CertLogic
 import DGCBloomFilter
 import DGCPartialVarHashFilter

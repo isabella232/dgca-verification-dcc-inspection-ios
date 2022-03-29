@@ -25,7 +25,7 @@
 //
 
 import Foundation
-import CoreLibrary
+import DGCCoreLibrary
 
 public class CountryModel: Codable {
   public let code: String

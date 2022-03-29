@@ -27,7 +27,7 @@
         
 
 import Foundation
-import CoreLibrary
+import DGCCoreLibrary
 
 public class SectionBuilder {
     public var infoSection = [InfoSection]()

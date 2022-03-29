@@ -26,7 +26,7 @@
 //  
 import Foundation
 import CertLogic
-import CoreLibrary
+import DGCCoreLibrary
 
 class CertLogicManager {
     static let shared = CertLogicManager()

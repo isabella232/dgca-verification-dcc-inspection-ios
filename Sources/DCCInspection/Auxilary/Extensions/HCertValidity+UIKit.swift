@@ -31,7 +31,7 @@ import UIKit
 #else
 import AppKit
 #endif
-import CoreLibrary
+import DGCCoreLibrary
 
 public extension HCertValidity {
   

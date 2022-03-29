@@ -27,7 +27,7 @@
 
 import Foundation
 import SwiftyJSON
-import CoreLibrary
+import DGCCoreLibrary
 
 public struct RecoveryEntry: HCertEntry {
     public var typeAddon: String { "" }

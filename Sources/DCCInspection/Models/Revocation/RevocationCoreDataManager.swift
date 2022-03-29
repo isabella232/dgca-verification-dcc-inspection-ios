@@ -27,7 +27,7 @@
 
 import Foundation
 import CoreData
-import CoreLibrary
+import DGCCoreLibrary
 import SwiftUI
 
 public enum DataBaseError: Error {
