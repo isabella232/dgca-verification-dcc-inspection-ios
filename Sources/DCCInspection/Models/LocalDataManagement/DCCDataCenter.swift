@@ -30,24 +30,24 @@ import Foundation
 import DGCCoreLibrary
 import CertLogic
 
-class DCCDataCenter {
-    static var appVersion: String {
+public class DCCDataCenter {
+    public static var appVersion: String {
         let versionValue = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "?.?.?"
         let buildNumValue = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "?.?.?"
         return "\(versionValue)(\(buildNumValue))"
     }
-    static let localDataManager: LocalDataManager = LocalDataManager()
-    static let revocationWorker: RevocationWorker = RevocationWorker()
+    public static let localDataManager: LocalDataManager = LocalDataManager()
+    public static let revocationWorker: RevocationWorker = RevocationWorker()
     
-    static var downloadedDataHasExpired: Bool {
+    public static var downloadedDataHasExpired: Bool {
         return lastFetch.timeIntervalSinceNow < -SharedConstants.expiredDataInterval
     }
    
-    static var appWasRunWithOlderVersion: Bool {
+    public static var appWasRunWithOlderVersion: Bool {
         return localDataManager.localData.lastLaunchedAppVersion != appVersion
     }
 
-    static var lastFetch: Date {
+    public static var lastFetch: Date {
         get {
             return localDataManager.localData.lastFetch
         }
@@ -56,7 +56,7 @@ class DCCDataCenter {
         }
     }
     
-    static var resumeToken: String {
+    public static var resumeToken: String {
         get {
             return localDataManager.localData.resumeToken
         }
@@ -65,7 +65,7 @@ class DCCDataCenter {
         }
     }
     
-    static var publicKeys: [String: [String]] {
+    public static var publicKeys: [String: [String]] {
         get {
             return localDataManager.localData.encodedPublicKeys
         }
@@ -74,7 +74,7 @@ class DCCDataCenter {
         }
     }
 
-    static var countryCodes: [CountryModel] {
+    public static var countryCodes: [CountryModel] {
         get {
             return localDataManager.localData.countryCodes
         }
@@ -83,7 +83,7 @@ class DCCDataCenter {
         }
     }
 
-    static var rules: [Rule] {
+    public static var rules: [Rule] {
         get {
           return localDataManager.localData.rules
         }
@@ -92,7 +92,7 @@ class DCCDataCenter {
         }
     }
     
-    static var valueSets: [ValueSet] {
+    public static var valueSets: [ValueSet] {
         get {
           return localDataManager.localData.valueSets
         }
@@ -101,24 +101,24 @@ class DCCDataCenter {
         }
     }
 
-    static func saveLocalData(completion: @escaping DataCompletionHandler) {
+    public static func saveLocalData(completion: @escaping DataCompletionHandler) {
         localDataManager.save(completion: completion)
     }
     
-    static func addValueSets(_ list: [ValueSet]) {
+    public static func addValueSets(_ list: [ValueSet]) {
         list.forEach { localDataManager.add(valueSet: $0) }
     }
 
-    static func addRules(_ list: [Rule]) {
+    public static func addRules(_ list: [Rule]) {
         list.forEach { localDataManager.add(rule: $0) }
     }
 
-    static func addCountries(_ list: [CountryModel]) {
+    public static func addCountries(_ list: [CountryModel]) {
         localDataManager.localData.countryCodes.removeAll()
         list.forEach { localDataManager.add(country: $0) }
     }
 
-    class func prepareLocalData(completion: @escaping DataCompletionHandler) {
+    public class func prepareLocalData(completion: @escaping DataCompletionHandler) {
         localDataManager.loadLocallyStoredData { result in
             CertLogicManager.shared.setRules(ruleList: rules)
             let shouldDownload = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
@@ -135,7 +135,7 @@ class DCCDataCenter {
         }
     }
     
-    static func reloadStorageData(completion: @escaping DataCompletionHandler) {
+    public static func reloadStorageData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
         
         let center = NotificationCenter.default

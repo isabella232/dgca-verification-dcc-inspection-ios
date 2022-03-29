@@ -30,12 +30,12 @@ import DGCCoreLibrary
 import SwiftyJSON
 import CertLogic
 
-class LocalDataManager {
+public class LocalDataManager {
     lazy var storage = SecureStorage<LocalData>(fileName: SharedConstants.dataStorageName)
     var localData = LocalData()
     
     // MARK: - Public Keys
-    func add(encodedPublicKey: String) {
+    public func add(encodedPublicKey: String) {
         let kid = KID.from(encodedPublicKey)
         let kidStr = KID.string(from: kid)
         
@@ -46,29 +46,29 @@ class LocalDataManager {
     }
     
     // MARK: - Countries
-    func add(country: CountryModel) {
+    public func add(country: CountryModel) {
         if !localData.countryCodes.contains(where: { $0.code == country.code }) {
             localData.countryCodes.append(country)
         }
     }
     
-    func update(country: CountryModel) {
+    public func update(country: CountryModel) {
         guard let countryFromDB = localData.countryCodes.filter({ $0.code == country.code }).first else { return }
         countryFromDB.debugModeEnabled = country.debugModeEnabled
     }
     
     // MARK: - ValueSets
-    func add(valueSet: ValueSet) {
+    public func add(valueSet: ValueSet) {
         if !localData.valueSets.contains(where: { $0.valueSetId == valueSet.valueSetId }) {
             localData.valueSets.append(valueSet)
         }
     }
     
-    func deleteValueSetWithHash(hash: String) {
+    public func deleteValueSetWithHash(hash: String) {
         localData.valueSets = localData.valueSets.filter { $0.hash != hash }
     }
     
-    func isValueSetExistWithHash(hash: String) -> Bool {
+    public func isValueSetExistWithHash(hash: String) -> Bool {
         return localData.valueSets.contains(where: { $0.hash == hash })
     }
     
@@ -82,26 +82,26 @@ class LocalDataManager {
     }
 
     // MARK: - Rules
-    func add(rule: Rule) {
+    public func add(rule: Rule) {
         if !localData.rules.contains(where: { $0.identifier == rule.identifier && $0.version == rule.version }) {
             localData.rules.append(rule)
         }
     }
     
-    func deleteRuleWithHash(hash: String) {
+    public func deleteRuleWithHash(hash: String) {
         localData.rules = localData.rules.filter { $0.hash != hash }
     }
       
-    func isRuleExistWithHash(hash: String) -> Bool {
+    public func isRuleExistWithHash(hash: String) -> Bool {
         return localData.rules.contains(where: { $0.hash == hash })
     }
 
     // MARK: - Config
-    func merge(other: JSON) {
+    public func merge(other: JSON) {
         localData.config.merge(other: other)
     }
     
-    var versionedConfig: JSON {
+    public var versionedConfig: JSON {
         if localData.config["versions"][DCCDataCenter.appVersion].exists() {
             return localData.config["versions"][DCCDataCenter.appVersion]
         } else {
@@ -110,11 +110,11 @@ class LocalDataManager {
     }
 
     // MARK: - Services
-    func save(completion: @escaping DataCompletionHandler) {
+    public func save(completion: @escaping DataCompletionHandler) {
         storage.save(localData, completion: completion)
     }
 
-    func loadLocallyStoredData(completion: @escaping DataCompletionHandler) {
+    public func loadLocallyStoredData(completion: @escaping DataCompletionHandler) {
         storage.loadStoredData(fallback: localData) { [unowned self] data in
             guard let loadedData = data else {
                 completion(.failure(DataOperationError.noInputData))
@@ -133,8 +133,8 @@ class LocalDataManager {
     }
 }
 
-class LocalDataKeyEncoder: PublicKeyStorageDelegate {
-    func getEncodedPublicKeys(for kidStr: String) -> [String] {
+public class LocalDataKeyEncoder: PublicKeyStorageDelegate {
+    public func getEncodedPublicKeys(for kidStr: String) -> [String] {
         DCCDataCenter.localDataManager.localData.encodedPublicKeys[kidStr] ?? []
     }
 }

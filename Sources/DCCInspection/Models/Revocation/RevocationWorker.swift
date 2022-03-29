@@ -31,23 +31,23 @@ import DGCCoreLibrary
 import SWCompression
 import CoreData
 
-typealias ProcessingCompletion = (RevocationError?) -> Void
+public typealias ProcessingCompletion = (RevocationError?) -> Void
 
-typealias RevocationProcessingCompletion = (Set<RevocationModel>?, Set<RevocationModel>?, RevocationError?) -> Void
-typealias PartitionProcessingCompletion = ([PartitionModel]?, RevocationError?) -> Void
-typealias MetadataProcessingCompletion = ([SliceMetaData]?, RevocationError?) -> Void
+public typealias RevocationProcessingCompletion = (Set<RevocationModel>?, Set<RevocationModel>?, RevocationError?) -> Void
+public typealias PartitionProcessingCompletion = ([PartitionModel]?, RevocationError?) -> Void
+public typealias MetadataProcessingCompletion = ([SliceMetaData]?, RevocationError?) -> Void
 
-class RevocationWorker {
-    init(service: RevocationServiceProtocol = RevocationService(baseServicePath: SharedConstants.revocationServiceBase)) {
+public class RevocationWorker {
+    public init(service: RevocationServiceProtocol = RevocationService(baseServicePath: SharedConstants.revocationServiceBase)) {
         self.revocationService = service
     }
     
-    let revocationCoreDataManager: RevocationCoreDataManager = RevocationCoreDataManager()
-    let revocationService: RevocationServiceProtocol
-    var loadedRevocations: [RevocationModel]?
+    public let revocationCoreDataManager: RevocationCoreDataManager = RevocationCoreDataManager()
+    public let revocationService: RevocationServiceProtocol
+    public var loadedRevocations: [RevocationModel]?
     
     // MARK: - Work with Revocations
-    func processReloadRevocations(completion: @escaping ProcessingCompletion) {
+    public func processReloadRevocations(completion: @escaping ProcessingCompletion) {
         self.revocationService.getRevocationLists {[unowned self] revocations, etag, err in
             guard err == nil else { completion(.network(reason: err!.localizedDescription)); return }
             guard let revocations = revocations, !revocations.isEmpty, let etag = etag else { completion(.nodata); return }

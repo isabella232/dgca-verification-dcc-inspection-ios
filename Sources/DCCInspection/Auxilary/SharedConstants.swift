@@ -28,11 +28,11 @@
 
 import Foundation
 
-enum SharedConstants {
-    static let expiredDataInterval: TimeInterval = 12.0 * 60 * 60
-    static let dataStorageName = "secure_storage"
+public enum SharedConstants {
+    public static let expiredDataInterval: TimeInterval = 12.0 * 60 * 60
+    public static let dataStorageName = "secure_storage"
     
-    static let linkToOpenGitHubSource = "https://github.com/eu-digital-green-certificates"
-    static let linkToOopenEuCertDoc = "https://ec.europa.eu/health/ehealth/covid-19_en"
-    static let revocationServiceBase = "https://dgca-revocation-service-eu-test.cfapps.eu10.hana.ondemand.com"
+    public static let linkToOpenGitHubSource = "https://github.com/eu-digital-green-certificates"
+    public static let linkToOopenEuCertDoc = "https://ec.europa.eu/health/ehealth/covid-19_en"
+    public static let revocationServiceBase = "https://dgca-revocation-service-eu-test.cfapps.eu10.hana.ondemand.com"
 }
