@@ -33,7 +33,7 @@ import AppKit
 #endif
 import DGCCoreLibrary
 
-extension ValidityState {
+public extension ValidityState {
     
     var technicalValidityString: String {
         switch self.technicalValidity {

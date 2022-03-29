@@ -28,7 +28,7 @@
 #if os(iOS)
 import UIKit
 
-extension UIColor {
+public extension UIColor {
     static var certificateRed: UIColor {
         UIColor(named: "certificateRed", in: .module, compatibleWith: nil)!
     }
