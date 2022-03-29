@@ -40,7 +40,7 @@ public class DCCCertificateValidator {
     public init(with cert: HCert) {
       self.certificate = cert
     }
-
+    
     public func validateDCCCertificate() -> ValidityState {
         let failures = findValidityFailures()
         

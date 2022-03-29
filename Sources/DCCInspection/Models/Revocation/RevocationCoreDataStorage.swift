@@ -41,7 +41,11 @@ public class RevocationCoreDataStorage {
          application to it. This property is optional since there are legitimate
          error conditions that could cause the creation of the store to fail.
         */
-        let container = NSPersistentContainer(name: "DCCRevocation")
+        let bundle = Bundle.module
+        let modelURL = bundle.url(forResource: "DCCRevocation", withExtension: ".momd")!
+        let model = NSManagedObjectModel(contentsOf: modelURL)!
+        let container = NSPersistentContainer(name: "DCCRevocation", managedObjectModel: model)
+        
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 // Replace this implementation with code to handle the error appropriately.
