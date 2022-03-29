@@ -32,16 +32,16 @@ import DGCBloomFilter
 import DGCPartialVarHashFilter
 
 
-class DCCCertificateValidator {
+public class DCCCertificateValidator {
     
     fileprivate let certificate: HCert
     fileprivate let revocationManager = RevocationCoreDataManager()
     
-    init(with cert: HCert) {
+    public init(with cert: HCert) {
       self.certificate = cert
     }
 
-    func validateDCCCertificate() -> ValidityState {
+    public func validateDCCCertificate() -> ValidityState {
         let failures = findValidityFailures()
         
         let technicalValidity: HCertValidity = failures.isEmpty ? .valid : .invalid
