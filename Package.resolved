@@ -65,6 +65,15 @@
         }
       },
       {
+        "package": "CoreLibrary",
+        "repositoryURL": "https://github.com/eu-digital-green-certificates/dgca-verification-core-library.git",
+        "state": {
+          "branch": "main",
+          "revision": "ba9b8897dd2bce56812caba10d7f3f0e8171bae5",
+          "version": null
+        }
+      },
+      {
         "package": "jsonlogic",
         "repositoryURL": "https://github.com/eu-digital-green-certificates/json-logic-swift.git",
         "state": {
@@ -116,6 +125,15 @@
           "branch": "master",
           "revision": "0209a2d1a30b1b42334c4ad3f8bd221b977b2273",
           "version": null
+        }
+      },
+      {
+        "package": "SwiftyJSON",
+        "repositoryURL": "https://github.com/SwiftyJSON/SwiftyJSON",
+        "state": {
+          "branch": null,
+          "revision": "b3dcd7dbd0d488e1a7077cb33b00f2083e382f07",
+          "version": "5.0.1"
         }
       }
     ]
