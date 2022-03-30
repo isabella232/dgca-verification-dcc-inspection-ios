@@ -37,6 +37,8 @@ public enum SharedConstants {
     static let keyAccessToken = "DGCAWallet.AccessToken"
     static let keyXnonce = "DGCAWallet.xnonce"
 
+    static let userDefaultsCountryKey = "UDCountryKey"
+
     static let linkToOpenGitHubSource = "https://github.com/eu-digital-green-certificates"
     static let linkToOopenEuCertDoc = "https://ec.europa.eu/health/ehealth/covid-19_en"
     

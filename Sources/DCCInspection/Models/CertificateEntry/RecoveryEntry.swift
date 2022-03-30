@@ -44,18 +44,18 @@ public struct RecoveryEntry: HCertEntry {
                 content: l10n("disease." + diseaseTargeted, or: "\("Unknown".localized): \(diseaseTargeted)")),
             InfoSection(header: "Valid from".localized, content: validFrom.localDateString),
             InfoSection(header: "Valid Until".localized, content: validUntil.localDateString),
-            InfoSection( header: "Country of Issuance".localized, content: country(for: countryCode), isPrivate: true),
-            InfoSection( header: "Statement Issuer".localized, content: issuer, isPrivate: true )
+            InfoSection(header: "Country of Issuance".localized, content: country(for: countryCode), isPrivate: true),
+            InfoSection(header: "Statement Issuer".localized, content: issuer, isPrivate: true)
         ]
     }
   
     public var walletInfo: [InfoSection] {
         return [InfoSection(header: "Valid from".localized, content: validFrom.localDateString),
             InfoSection(header: "Valid Until".localized, content: validUntil.localDateString),
-            InfoSection( header: "Targeted Disease".localized, content: l10n("disease." + diseaseTargeted,
+            InfoSection(header: "Targeted Disease".localized, content: l10n("disease." + diseaseTargeted,
                 or: "\("Unknown".localized): \(diseaseTargeted)")),
-            InfoSection( header: "Country of Issuance".localized, content: country(for: countryCode), isPrivate: true),
-            InfoSection( header: "Statement Issuer".localized, content: issuer, isPrivate: true )
+            InfoSection(header: "Country of Issuance".localized, content: country(for: countryCode), isPrivate: true),
+            InfoSection(header: "Statement Issuer".localized, content: issuer, isPrivate: true)
         ]
     }
 

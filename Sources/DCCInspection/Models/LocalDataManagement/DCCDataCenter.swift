@@ -237,13 +237,13 @@ public class DCCDataCenter {
         }
         
         group.notify(queue: .main) {
-            localDataManager.localData.lastFetch = Date()
-            
             if errorOccured == true {
                 DispatchQueue.main.async {
                     completion(.failure(.noInputData))
                 }
             } else {
+                lastFetch = Date()
+                lastLaunchedAppVersion = Self.appVersion
                 saveLocalData(completion: completion)
             }
         }
@@ -358,12 +358,13 @@ extension DCCDataCenter {
         }
         
         group.notify(queue: .main) {
-            localDataManager.localData.lastFetch = Date()
             if errorOccured == true {
                 DispatchQueue.main.async {
                     completion(.failure(.noInputData))
                 }
             } else {
+                lastFetch = Date()
+                lastLaunchedAppVersion = Self.appVersion
                 saveLocalData(completion: completion)
             }
         }

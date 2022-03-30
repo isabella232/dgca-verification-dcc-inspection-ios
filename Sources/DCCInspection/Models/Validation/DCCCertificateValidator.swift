@@ -41,6 +41,35 @@ public class DCCCertificateValidator {
       self.certificate = cert
     }
     
+    public func validateWalletCertificate() -> ValidityState {
+        let failures = findValidityFailures()
+        
+        let technicalValidity: HCertValidity = failures.isEmpty ? .valid : .invalid
+        let issuerValidity = validateCertLogicForIssuer()
+        let destinationValidity = validateCertLogicForDestination()
+        let travalerValidity = validateCertLogicForTraveller()
+        
+        let (infoRulesSection, allRulesValidity): (InfoSection?, HCertValidity)
+        if technicalValidity == .valid {
+            (infoRulesSection, allRulesValidity) = validateCertLogicForAllRules()
+        } else {
+            (infoRulesSection, allRulesValidity) = (nil, .invalid)
+        }
+        
+        let validityState = ValidityState(
+            technicalValidity: technicalValidity,
+            issuerValidity: issuerValidity,
+            destinationValidity: destinationValidity,
+            travalerValidity: travalerValidity,
+            allRulesValidity: allRulesValidity,
+            revocationValidity: .valid,
+            validityFailures: failures,
+            infoRulesSection: infoRulesSection
+        )
+        
+       return validityState
+    }
+    
     public func validateDCCCertificate() -> ValidityState {
         let failures = findValidityFailures()
         

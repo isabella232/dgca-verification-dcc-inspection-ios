@@ -42,7 +42,7 @@ struct Payload: Encodable {
 	let exp: Double
 }
 
-class DGCAJwt {
+public class DGCAJwt {
 	private static func makeJwtPayload(cert: HCert) -> Payload {
 		let payload: [String] = [cert.uvciHash![0..<(cert.uvciHash!.count/2)].toHexString(),
              cert.signatureHash![0..<(cert.signatureHash!.count/2)].toHexString(),

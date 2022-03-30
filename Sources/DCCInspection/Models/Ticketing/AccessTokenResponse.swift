@@ -28,7 +28,7 @@
 
 import Foundation
 
-struct AccessTokenResponse : Codable {
+public struct AccessTokenResponse : Codable {
   let jti           : String?
   let lss           : String?
   let iat           : Int?
@@ -43,14 +43,14 @@ struct AccessTokenResponse : Codable {
   let results       : [LimitationInfo]?
 }
 
-struct LimitationInfo : Codable {
+public struct LimitationInfo : Codable {
   let identifier  : String
   let result      : String
   let type        : String
   let details     : String
 }
 
-struct ValidationCertificate : Codable {
+public struct ValidationCertificate : Codable {
   let lang            : String
   let fnt             : String
   let gnt             : String
