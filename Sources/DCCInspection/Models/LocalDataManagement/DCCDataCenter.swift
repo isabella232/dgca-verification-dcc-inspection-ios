@@ -120,7 +120,7 @@ public class DCCDataCenter {
             localDataManager.localData.valueSets = newValue
         }
     }
-
+    
     public static var images: [SavedImage] {
         get {
             return localImageManager.localData.images
@@ -130,7 +130,7 @@ public class DCCDataCenter {
         }
     }
     
-    static var pdfs: [SavedPDF] {
+    public static var pdfs: [SavedPDF] {
         get {
             return localImageManager.localData.pdfs
         }
