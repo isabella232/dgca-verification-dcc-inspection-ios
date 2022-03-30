@@ -33,14 +33,14 @@ public enum SharedConstants {
     static let dataStorageName = "secure_storage"
     static let imageStorageName = "images_secure"
 
-    static let keyTicketingToken = "DGCAWallet.TicketingToken"
-    static let keyAccessToken = "DGCAWallet.AccessToken"
-    static let keyXnonce = "DGCAWallet.xnonce"
+    public static let keyTicketingToken = "DGCAWallet.TicketingToken"
+    public static let keyAccessToken = "DGCAWallet.AccessToken"
+    public static let keyXnonce = "DGCAWallet.xnonce"
 
-    static let userDefaultsCountryKey = "UDCountryKey"
+    public static let userDefaultsCountryKey = "UDCountryKey"
 
-    static let linkToOpenGitHubSource = "https://github.com/eu-digital-green-certificates"
-    static let linkToOopenEuCertDoc = "https://ec.europa.eu/health/ehealth/covid-19_en"
+    public static let linkToOpenGitHubSource = "https://github.com/eu-digital-green-certificates"
+    public static let linkToOopenEuCertDoc = "https://ec.europa.eu/health/ehealth/covid-19_en"
     
     public static let revocationServiceBase = "https://dgca-revocation-service-eu-test.cfapps.eu10.hana.ondemand.com"
 }
