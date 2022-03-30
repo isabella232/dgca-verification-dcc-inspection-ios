@@ -30,22 +30,22 @@ import Foundation
 import DGCCoreLibrary
 import CertLogic
 
-class LocalData: Codable {
-    var encodedPublicKeys = [String : [String]]()
-    var certStrings = [DatedCertString]()
+public class LocalData: Codable {
+    public var encodedPublicKeys = [String : [String]]()
+    public var certStrings = [DatedCertString]()
 
-    var countryCodes = [CountryModel]()
-    var valueSets = [ValueSet]()
-    var rules = [Rule]()
+    public var countryCodes = [CountryModel]()
+    public var valueSets = [ValueSet]()
+    public var rules = [Rule]()
     
-    var resumeToken: String = ""
-    var lastFetch: Date = Date.distantPast
+    public var resumeToken: String = ""
+    public var lastFetch: Date = Date.distantPast
 
-    var config = Config.load()
-    var lastLaunchedAppVersion = "0.0"
+    public var config = Config.load()
+    public var lastLaunchedAppVersion = "0.0"
 }
 
-class ImageDataStorage: Codable {
-    var images = [SavedImage]()
-    var pdfs = [SavedPDF]()
+public class ImageDataStorage: Codable {
+    public var images = [SavedImage]()
+    public var pdfs = [SavedPDF]()
 }
