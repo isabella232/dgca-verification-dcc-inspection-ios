@@ -67,7 +67,7 @@ public class DCCDataCenter {
         }
     }
     
-    static var certStrings: [DatedCertString] {
+    public static var certStrings: [DatedCertString] {
         get {
           return localDataManager.localData.certStrings
         }
