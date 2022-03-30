@@ -48,6 +48,15 @@ public class DCCDataCenter {
     public static var appWasRunWithOlderVersion: Bool {
         return localDataManager.localData.lastLaunchedAppVersion != appVersion
     }
+    
+    public static var lastLaunchedAppVersion: String {
+        get {
+            return localDataManager.localData.lastLaunchedAppVersion
+        }
+        set {
+            localDataManager.localData.lastLaunchedAppVersion = newValue
+        }
+    }
 
     public static var lastFetch: Date {
         get {
