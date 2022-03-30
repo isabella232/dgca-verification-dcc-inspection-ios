@@ -56,7 +56,7 @@ public typealias RuleCompletionHandler = (Rule?, GatewayError?) -> Void
 public typealias CountryCompletionHandler = ([CountryModel]?, GatewayError?) -> Void
 
 public class GatewayConnection: ContextConnection {
-    static func certUpdate(resume resumeToken: String? = nil, completion: @escaping CertUpdateCompletion) {
+    public static func certUpdate(resume resumeToken: String? = nil, completion: @escaping CertUpdateCompletion) {
         var headers = [String: String]()
         if let token = resumeToken {
             headers["x-resume-token"] = token
@@ -88,7 +88,7 @@ public class GatewayConnection: ContextConnection {
         }
     }
     
-    static func certStatus(resume resumeToken: String? = nil, completion: @escaping CertStatusCompletion) {
+    public static func certStatus(resume resumeToken: String? = nil, completion: @escaping CertStatusCompletion) {
         request(["endpoints", "status"]).response {
             guard case let .success(result) = $0.result,
                 let response = result,
@@ -103,7 +103,7 @@ public class GatewayConnection: ContextConnection {
         }
     }
     
-    static func updateLocalDataStorage(completion: @escaping GatewayCompletion) {
+    public static func updateLocalDataStorage(completion: @escaping GatewayCompletion) {
         certUpdate(resume: DCCDataCenter.resumeToken) { encodedCert, token, err in
             guard err == nil else {
                 completion(GatewayError.connection(error: err!))
@@ -168,7 +168,7 @@ public class GatewayConnection: ContextConnection {
 }
 
 // MARK: Country, Rules, Valuesets extension
-extension GatewayConnection {
+public extension GatewayConnection {
     // MARK: Country List
     static func getListOfCountry(completion: @escaping CountryCompletionHandler) {
         request(["endpoints", "countryList"], method: .get).response {
@@ -350,7 +350,7 @@ extension GatewayConnection {
     }
 }
 
-extension GatewayConnection {
+public extension GatewayConnection {
     static func claim(cert: HCert, with tan: String?, completion: @escaping ContextCompletion) {
         guard var tan = tan, !tan.isEmpty else {
             completion(false, nil, GatewayError.insufficientData)
