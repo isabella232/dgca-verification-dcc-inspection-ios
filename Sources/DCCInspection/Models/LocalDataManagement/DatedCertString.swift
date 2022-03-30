@@ -27,16 +27,16 @@
 
 import Foundation
 
-class DatedCertString: Codable {
-    var isSelected: Bool = false
-    let date: Date
-    let certString: String
-    let storedTAN: String?
-    var cert: HCert? {
+public class DatedCertString: Codable {
+    public var isSelected: Bool = false
+    public let date: Date
+    public let certString: String
+    public let storedTAN: String?
+    public var cert: HCert? {
         return try? HCert(from: certString)
     }
     
-    init(date: Date, certString: String, storedTAN: String?, isRevoked: Bool?) {
+    public init(date: Date, certString: String, storedTAN: String?, isRevoked: Bool?) {
         self.date = date
         if isRevoked != nil && isRevoked == true {
             self.certString = "x" + certString
