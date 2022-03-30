@@ -288,6 +288,7 @@ extension DCCDataCenter {
             }
 
         } else {
+            var errorOccured = false
             localGroup.enter()
             localDataManager.loadLocallyStoredData { result in
                 CertLogicManager.shared.setRules(ruleList: rules)
