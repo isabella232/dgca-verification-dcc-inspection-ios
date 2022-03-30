@@ -261,63 +261,63 @@ public class DCCDataCenter {
 
 extension DCCDataCenter {
     public class func prepareWalletLocalData(completion: @escaping DataCompletionHandler) {
-        let group = DispatchGroup()
-        group.enter()
+        let localGroup = DispatchGroup()
+        localGroup.enter()
         var requestResult: DataOperationResult = .success
         
         initializeAllWalletStorageData { result in
             requestResult = result
             CertLogicManager.shared.setRules(ruleList: rules)
-            group.leave()
+            localGroup.leave()
         }
-        group.wait()
+        localGroup.wait()
         
         let shouldDownload = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
         if !shouldDownload {
-            group.notify(queue: .main) {
+            localGroup.notify(queue: .main) {
                 completion(.success)
             }
 
         } else {
-            group.enter()
+            localGroup.enter()
             reloadWalletStorageData { result in
                 requestResult = result
-                group.leave()
+                localGroup.leave()
             }
-            group.wait()
+            localGroup.wait()
             
-            group.enter()
+            localGroup.enter()
             localDataManager.loadLocallyStoredData { result in
                 requestResult = result
                 CertLogicManager.shared.setRules(ruleList: rules)
-                group.leave()
+                localGroup.leave()
             }
-            group.notify(queue: .main) {
+            localGroup.notify(queue: .main) {
                 completion(requestResult)
             }
         }
     }
     
     public static func initializeAllWalletStorageData(completion: @escaping DataCompletionHandler) {
-        let group = DispatchGroup()
+        let walletGroup = DispatchGroup()
         
-        group.enter()
+        walletGroup.enter()
         localDataManager.loadLocallyStoredData { result in
             CertLogicManager.shared.setRules(ruleList: rules)
-            group.leave()
+            walletGroup.leave()
         }
         
-        group.enter()
+        walletGroup.enter()
         localImageManager.loadLocallyStoredData { result in
-          group.leave()
+            walletGroup.leave()
         }
         
-        group.enter()
+        walletGroup.enter()
         GatewayConnection.lookup(certStrings: certStrings) { success, _, err in
-            group.leave()
+            walletGroup.leave()
         }
         
-        group.notify(queue: .main) {
+        walletGroup.notify(queue: .main) {
             completion(.success)
         }
     }
