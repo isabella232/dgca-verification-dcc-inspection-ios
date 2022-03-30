@@ -34,10 +34,10 @@ public enum ValidityCellModelType: Int {
 }
 
 public final class ValidityCellModel {
-    var cellType: ValidityCellModelType = .titleAndDescription
-    var title: String?
-    var description: String?
-    var needChangeTitleFont: Bool = false
+    public var cellType: ValidityCellModelType = .titleAndDescription
+    public var title: String?
+    public var description: String?
+    public var needChangeTitleFont: Bool = false
     
     public init(cellType: ValidityCellModelType = .titleAndDescription, title: String? = nil, description: String? = nil,
          needChangeTitleFont: Bool = false) {
