@@ -38,6 +38,15 @@
         }
       },
       {
+        "package": "CryptoSwift",
+        "repositoryURL": "https://github.com/krzyzanowskim/CryptoSwift",
+        "state": {
+          "branch": null,
+          "revision": "12f2389aca4a07e0dd54c86ec23d0721ed88b8db",
+          "version": "1.4.3"
+        }
+      },
+      {
         "package": "DGCBloomFilter",
         "repositoryURL": "https://github.com/eu-digital-green-certificates/dgc-bloomfilter-ios.git",
         "state": {
@@ -69,7 +78,7 @@
         "repositoryURL": "https://github.com/eu-digital-green-certificates/dgca-verification-core-library.git",
         "state": {
           "branch": "main",
-          "revision": "7de7cfe6eb535cf99098ba9531f7dbeb5041d21d",
+          "revision": "525e6c95e0c3cf4710046f885f7fb97af50e0790",
           "version": null
         }
       },
@@ -89,6 +98,15 @@
           "branch": "master",
           "revision": "addef0a5c7ed181d877f1fdfde1e3fc1c6c28cfe",
           "version": null
+        }
+      },
+      {
+        "package": "JWTDecode",
+        "repositoryURL": "https://github.com/auth0/JWTDecode.swift.git",
+        "state": {
+          "branch": null,
+          "revision": "3cd207fb9e943b6168a117baa3936c823204c2dc",
+          "version": "2.6.3"
         }
       },
       {

@@ -30,6 +30,7 @@ import Alamofire
 import DGCCoreLibrary
 import SwiftyJSON
 import CertLogic
+import JWTDecode
 
 enum GatewayError: Error {
   case insufficientData
@@ -347,4 +348,212 @@ extension GatewayConnection {
             completion(DCCDataCenter.valueSets, nil)
         }
     }
+}
+
+extension GatewayConnection {
+    static func claim(cert: HCert, with tan: String?, completion: @escaping ContextCompletion) {
+        guard var tan = tan, !tan.isEmpty else {
+            completion(false, nil, GatewayError.insufficientData)
+            return
+        }
+        
+        // Replace dashes, spaces, etc. and turn into uppercase.
+        let set = CharacterSet(charactersIn: "0123456789").union(.uppercaseLetters)
+        tan = tan.uppercased().components(separatedBy: set.inverted).joined()
+        
+        let tanHash = SHA256.stringDigest(input: Data(tan.data(using: .utf8) ?? .init()))
+        let certHash = cert.certHash
+        let pubKey = (X509.derPubKey(for: cert.keyPair) ?? Data()).base64EncodedString()
+        
+        let toBeSigned = tanHash + certHash + pubKey
+        let toBeSignedData = Data(toBeSigned.data(using: .utf8) ?? .init())
+        
+        Enclave.sign(data: toBeSignedData, with: cert.keyPair, using: .ecdsaSignatureMessageX962SHA256) { sign, err in
+            guard err == nil else {
+                completion(false, nil, GatewayError.local(description: err!))
+                return
+            }
+            guard let sign = sign else {
+                completion(false, nil, GatewayError.local(description: "No sign"))
+                return
+            }
+            let keyParam: [String: Any] = [ "type": "EC", "value": pubKey ]
+            let param: [String: Any] = [
+                "DGCI": cert.uvci,
+                "TANHash": tanHash,
+                "certhash": certHash,
+                "publicKey": keyParam,
+                "signature": sign.base64EncodedString(),
+                "sigAlg": "SHA256withECDSA"
+            ]
+            request( ["endpoints", "claim"], method: .post, parameters: param, encoding: JSONEncoding.default,
+                     headers: HTTPHeaders([HTTPHeader(name: "content-type", value: "application/json")])).response {
+                guard case .success(_) = $0.result, let status = $0.response?.statusCode, status / 100 == 2 else {
+                    completion(false, nil, GatewayError.local(description: "Cannot claim certificate"))
+                    return
+                }
+                let response = String(data: $0.data ?? .init(), encoding: .utf8)
+                let json = JSON(parseJSON: response ?? "")
+                let newTAN = json["tan"].string
+                completion(true, newTAN, nil)
+            }
+        }
+    }
+    
+    static func lookup(certStrings: [DatedCertString], completion: @escaping ContextCompletion) {
+        guard certStrings.count != 0 else { completion(true, nil, nil); return; }
+        // construct certs from strings
+        var certs: [Date: HCert] = [:]
+        for string in certStrings {
+            guard let c = string.cert else { completion(false, nil, nil); return; }
+            // certs.append(c)
+            certs[string.date] = c
+        }
+        
+        DGCAJwt.makeJwtAndSign(fromCerts: Array(certs.values)) { success, jwts, error in
+            guard let jwts = jwts,
+                  success == true,
+                  error == nil else {
+                      completion(false, nil, GatewayError.local(description: "JWT creation failed!"))
+                      return
+                  }
+            // let param = ["value": jwts]
+            var request = URLRequest(url: URL(string: "https://dgca-revocation-service-eu-test.cfapps.eu10.hana.ondemand.com/revocation/lookup")!)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try! JSONSerialization.data(withJSONObject: jwts)
+            AF.request(request).response {
+                guard case .success = $0.result,
+                    let status = $0.response?.statusCode,
+                    let response = try? JSONSerialization.jsonObject(with: $0.data ?? .init(), options: []) as? [String],
+                    status / 100 == 2
+                else {
+                    completion(false, nil, nil)
+                    return
+                }
+                if response.count == 0 { completion(true, nil, nil); return }
+                // response is list of hashes that have been revoked
+                let revokedHashes = response as [String]
+                for revokedHash in revokedHashes {
+                    certs.forEach { date, cert in
+                        if revokedHash.elementsEqual(cert.uvciHash![0..<cert.uvciHash!.count/2].toHexString()) ||
+                            revokedHash.elementsEqual(cert.signatureHash![0..<cert.signatureHash!.count/2].toHexString()) ||
+                            revokedHash.elementsEqual(cert.countryCodeUvciHash![0..<cert.countryCodeUvciHash!.count/2].toHexString()) {
+                            cert.isRevoked = true
+                            // remove old certificate and add new
+                            DCCDataCenter.localDataManager.remove(withDate: date) { status in
+                                guard case .success = status else { completion(false, nil, nil); return }
+                                var storedTan: String?
+                                certStrings.forEach { certString in
+                                    if certString.cert!.certHash.elementsEqual(cert.certHash) {
+                                        storedTan = certString.storedTAN ?? nil
+                                    }
+                                }
+                                DCCDataCenter.localDataManager.add(cert, with: storedTan) { status in
+                                    guard case .success = status else { completion(false, nil, nil); return }
+                                }
+                            }
+                        }
+                    }
+                }
+                completion(true, nil, nil)
+            }
+        }
+    }
+}
+
+typealias TicketingCompletion = (AccessTokenResponse?, GatewayError?) -> Void
+typealias ContextCompletion = (Bool, String?, GatewayError?) -> Void
+
+extension GatewayConnection {
+    static func loadAccessToken(_ url : URL, servicePath : String, publicKey: String, completion: @escaping TicketingCompletion) {
+        let json: [String: Any] = ["service": servicePath, "pubKey": publicKey]
+        
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: json,options: .prettyPrinted),
+              let tokenData = SecureKeyChain.load(key: SharedConstants.keyTicketingToken)  else {
+                  completion(nil, GatewayError.tokenError)
+                  return
+              }
+        let token = String(decoding: tokenData, as: UTF8.self)
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = jsonData
+        request.addValue( "1.0.0", forHTTPHeaderField: "X-Version")
+        request.addValue( "application/json", forHTTPHeaderField: "content-type")
+        request.addValue( "Bearer " + token, forHTTPHeaderField: "Authorization")
+        
+        let session = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error in
+            guard error == nil else {
+                completion(nil, GatewayError.connection(error: error!))
+                return
+            }
+            guard let responseData = data, let tokenJWT = String(data: responseData, encoding: .utf8), responseData.count > 0 else {
+                completion(nil, GatewayError.incorrectDataResponse)
+                return
+            }
+            do {
+                let decodedToken = try decode(jwt: tokenJWT)
+                let jsonData = try JSONSerialization.data(withJSONObject: decodedToken.body)
+                let accessTokenResponse = try JSONDecoder().decode(AccessTokenResponse.self, from: jsonData)
+                
+                if let tokenData = tokenJWT.data(using: .utf8) {
+                    SecureKeyChain.save(key: SharedConstants.keyAccessToken, data: tokenData)
+                }
+                if let httpResponse = response as? HTTPURLResponse,
+                   let xnonceData = (httpResponse.allHeaderFields["x-nonce"] as? String)?.data(using: .utf8) {
+                    SecureKeyChain.save(key: SharedConstants.keyXnonce, data: xnonceData)
+                }
+                completion(accessTokenResponse, nil)
+                
+            } catch {
+                completion(nil, GatewayError.encodingError)
+                DGCLogger.logError(error)
+            }
+        })
+        session.resume()
+    }
+    
+    static func validateTicketing(url : URL, parameters : [String: String]?, completion : @escaping TicketingCompletion) {
+        guard let parametersData = try? JSONEncoder().encode(parameters) else {
+            completion(nil, GatewayError.encodingError)
+            return
+        }
+        guard let tokenData = SecureKeyChain.load(key: SharedConstants.keyAccessToken) else {
+            completion(nil, GatewayError.tokenError)
+            return
+        }
+        let token = String(decoding: tokenData, as: UTF8.self)
+        var request = URLRequest(url: url)
+        request.method = .post
+        request.httpBody = parametersData
+        
+        request.addValue( "1.0.0", forHTTPHeaderField: "X-Version")
+        request.addValue( "application/json", forHTTPHeaderField: "content-type")
+        request.addValue( "Bearer " + token, forHTTPHeaderField: "Authorization")
+        
+        let session = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error in
+            guard error == nil else {
+                completion(nil,GatewayError.connection(error: error!))
+                return
+            }
+            guard let responseData = data, let tokenJWT = String(data: responseData, encoding: .utf8) else {
+                completion(nil, GatewayError.incorrectDataResponse)
+                return
+            }
+            do {
+                let decodedToken = try decode(jwt: tokenJWT)
+                let jsonData = try JSONSerialization.data(withJSONObject: decodedToken.body)
+                let decoder = JSONDecoder()
+                let accessTokenResponse = try decoder.decode(AccessTokenResponse.self, from: jsonData)
+                completion(accessTokenResponse, nil)
+                
+            } catch {
+                completion(nil, GatewayError.parsingError)
+                DGCLogger.logError(error)
+            }
+        })
+        session.resume()
+    }
+
 }

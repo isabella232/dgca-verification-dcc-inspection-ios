@@ -22,7 +22,9 @@ let package = Package(
         .package(name: "CertLogic", url: "https://github.com/eu-digital-green-certificates/dgc-certlogic-ios", .branch("main")),
         .package(name: "DGCBloomFilter", url: "https://github.com/eu-digital-green-certificates/dgc-bloomfilter-ios.git", .branch("main")),
         .package(name: "DGCPartialVarHashFilter", url: "https://github.com/eu-digital-green-certificates/dgca-partialvarhashfilter-ios.git", .branch("main")),
-        .package(name: "DGCCoreLibrary", url: "https://github.com/eu-digital-green-certificates/dgca-verification-core-library.git", .branch("main"))
+        .package(name: "DGCCoreLibrary", url: "https://github.com/eu-digital-green-certificates/dgca-verification-core-library.git", .branch("main")),
+        .package(name: "CryptoSwift", url: "https://github.com/krzyzanowskim/CryptoSwift",  from: "1.0.0"),
+        .package(name: "JWTDecode", url: "https://github.com/auth0/JWTDecode.swift.git",  from: "2.0.0"),
     ],
     
     targets: [
@@ -36,7 +38,9 @@ let package = Package(
                 "JSONSchema",
                 "SWCompression",
                 "DGCBloomFilter",
+                "CryptoSwift",
                 "DGCPartialVarHashFilter",
+                "JWTDecode",
                 "DGCCoreLibrary"
             ],
             resources: [

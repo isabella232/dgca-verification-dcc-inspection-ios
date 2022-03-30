@@ -29,10 +29,16 @@
 import Foundation
 
 public enum SharedConstants {
-    public static let expiredDataInterval: TimeInterval = 12.0 * 60 * 60
-    public static let dataStorageName = "secure_storage"
+    static let expiredDataInterval: TimeInterval = 12.0 * 60 * 60
+    static let dataStorageName = "secure_storage"
+    static let imageStorageName = "images_secure"
+
+    static let keyTicketingToken = "DGCAWallet.TicketingToken"
+    static let keyAccessToken = "DGCAWallet.AccessToken"
+    static let keyXnonce = "DGCAWallet.xnonce"
+
+    static let linkToOpenGitHubSource = "https://github.com/eu-digital-green-certificates"
+    static let linkToOopenEuCertDoc = "https://ec.europa.eu/health/ehealth/covid-19_en"
     
-    public static let linkToOpenGitHubSource = "https://github.com/eu-digital-green-certificates"
-    public static let linkToOopenEuCertDoc = "https://ec.europa.eu/health/ehealth/covid-19_en"
     public static let revocationServiceBase = "https://dgca-revocation-service-eu-test.cfapps.eu10.hana.ondemand.com"
 }

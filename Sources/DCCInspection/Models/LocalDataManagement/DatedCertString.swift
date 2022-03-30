@@ -18,34 +18,31 @@
  * limitations under the License.
  * ---license-end
  */
+//
+//  DatedCertString.swift
 //  
-//  DataStuctures.swift
-//  DGCAVerifier
-//  
-//  Created by Igor Khomiak on 11/3/21.
-//  
-        
+//
+//  Created by Igor Khomiak on 30.03.2022.
+//
 
 import Foundation
-import DGCCoreLibrary
-import CertLogic
 
-class LocalData: Codable {
-    var encodedPublicKeys = [String : [String]]()
-    var certStrings = [DatedCertString]()
-
-    var countryCodes = [CountryModel]()
-    var valueSets = [ValueSet]()
-    var rules = [Rule]()
+class DatedCertString: Codable {
+    var isSelected: Bool = false
+    let date: Date
+    let certString: String
+    let storedTAN: String?
+    var cert: HCert? {
+        return try? HCert(from: certString)
+    }
     
-    var resumeToken: String = ""
-    var lastFetch: Date = Date.distantPast
-
-    var config = Config.load()
-    var lastLaunchedAppVersion = "0.0"
-}
-
-class ImageDataStorage: Codable {
-    var images = [SavedImage]()
-    var pdfs = [SavedPDF]()
+    init(date: Date, certString: String, storedTAN: String?, isRevoked: Bool?) {
+        self.date = date
+        if isRevoked != nil && isRevoked == true {
+            self.certString = "x" + certString
+        } else {
+            self.certString = certString
+        }
+        self.storedTAN = storedTAN
+    }
 }

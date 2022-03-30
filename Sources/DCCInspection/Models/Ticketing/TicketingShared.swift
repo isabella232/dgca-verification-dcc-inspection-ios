@@ -1,7 +1,7 @@
 //
 /*-
  * ---license-start
- * eu-digital-green-certificates / dgca-verifier-app-ios
+ * eu-digital-green-certificates / dgca-wallet-app-ios
  * ---
  * Copyright (C) 2021 T-Systems International GmbH and all other contributors
  * ---
@@ -19,33 +19,24 @@
  * ---license-end
  */
 //  
-//  DataStuctures.swift
-//  DGCAVerifier
+//  TicketingShared.swift
+//  DGCAWallet
 //  
-//  Created by Igor Khomiak on 11/3/21.
+//  Created by Igor Khomiak on 06.12.2021.
 //  
         
 
 import Foundation
-import DGCCoreLibrary
-import CertLogic
 
-class LocalData: Codable {
-    var encodedPublicKeys = [String : [String]]()
-    var certStrings = [DatedCertString]()
+typealias EncodingCompletion = ((Data, Data)?, EncodeError?) -> Void
 
-    var countryCodes = [CountryModel]()
-    var valueSets = [ValueSet]()
-    var rules = [Rule]()
-    
-    var resumeToken: String = ""
-    var lastFetch: Date = Date.distantPast
-
-    var config = Config.load()
-    var lastLaunchedAppVersion = "0.0"
+enum EncodeError: Error {
+    case incorrectPayload
+    case encryptionData
 }
 
-class ImageDataStorage: Codable {
-    var images = [SavedImage]()
-    var pdfs = [SavedPDF]()
+enum ValidationConstants  {
+    static let dccEncryptionScheme2021 = "DccEncryptionScheme2021"
+    static let rsaOAEPWithSHA256AESGCM = "RSAOAEPWithSHA256AESGCM"
+    static let sha256withECDSA = "SHA256withECDSA"
 }

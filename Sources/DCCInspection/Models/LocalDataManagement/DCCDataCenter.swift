@@ -37,6 +37,8 @@ public class DCCDataCenter {
         return "\(versionValue)(\(buildNumValue))"
     }
     public static let localDataManager: LocalDataManager = LocalDataManager()
+    public static let localImageManager: LocalImageManager = LocalImageManager()
+
     public static let revocationWorker: RevocationWorker = RevocationWorker()
     
     public static var downloadedDataHasExpired: Bool {
@@ -53,6 +55,15 @@ public class DCCDataCenter {
         }
         set {
             localDataManager.localData.lastFetch = newValue
+        }
+    }
+    
+    static var certStrings: [DatedCertString] {
+        get {
+          return localDataManager.localData.certStrings
+        }
+        set {
+          localDataManager.localData.certStrings = newValue
         }
     }
     
@@ -101,6 +112,24 @@ public class DCCDataCenter {
         }
     }
 
+    public static var images: [SavedImage] {
+        get {
+            return localImageManager.localData.images
+        }
+        set {
+            localImageManager.localData.images = newValue
+        }
+    }
+    
+    static var pdfs: [SavedPDF] {
+        get {
+            return localImageManager.localData.pdfs
+        }
+        set {
+            localImageManager.localData.pdfs = newValue
+        }
+    }
+
     public static func saveLocalData(completion: @escaping DataCompletionHandler) {
         localDataManager.save(completion: completion)
     }
@@ -118,56 +147,79 @@ public class DCCDataCenter {
         list.forEach { localDataManager.add(country: $0) }
     }
 
-    public class func prepareLocalData(completion: @escaping DataCompletionHandler) {
+    public static func prepareLocalData(completion: @escaping DataCompletionHandler) {
+        let group = DispatchGroup()
+        group.enter()
         localDataManager.loadLocallyStoredData { result in
             CertLogicManager.shared.setRules(ruleList: rules)
-            let shouldDownload = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
-            if !shouldDownload {
-                completion(result)
-            } else {
-                reloadStorageData { result in
-                    localDataManager.loadLocallyStoredData { result in
-                        CertLogicManager.shared.setRules(ruleList: rules)
+            group.leave()
+        }
+        group.wait()
+        
+        let areNotDownloadedData = countryCodes.isEmpty || rules.isEmpty || valueSets.isEmpty
+        let shouldReloadData = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
+        
+        if areNotDownloadedData || shouldReloadData {
+            reloadAllStorageData { result in
+                if case .failure(_) = result {
+                    if areNotDownloadedData {
+                        completion(.noData)
+                    } else {
                         completion(result)
+                    }
+                } else {
+                    localDataManager.loadLocallyStoredData { result in
+                        let areNotDownloadedData = countryCodes.isEmpty || rules.isEmpty || valueSets.isEmpty
+                        if areNotDownloadedData {
+                            completion(.noData)
+                        }
+                        CertLogicManager.shared.setRules(ruleList: rules)
+                        completion(.success)
                     }
                 }
             }
+            
+        } else {
+            localDataManager.loadLocallyStoredData { result in
+                CertLogicManager.shared.setRules(ruleList: rules)
+                completion(result)
+            }
         }
     }
-    
-    public static func reloadStorageData(completion: @escaping DataCompletionHandler) {
+
+    static func reloadAllStorageData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
-        
-        let center = NotificationCenter.default
-        center.post(name: Notification.Name("StartLoadingNotificationName"), object: nil, userInfo: nil )
-        
-        group.enter()
+                
+        var errorOccured = false
         localDataManager.loadLocallyStoredData { result in
             CertLogicManager.shared.setRules(ruleList: rules)
             
             group.enter()
             GatewayConnection.updateLocalDataStorage { err in
+                if err != nil { errorOccured = true }
                 group.leave()
             }
             
             group.enter()
             GatewayConnection.loadCountryList { list, err in
+                if err != nil { errorOccured = true }
                 group.leave()
             }
             
             group.enter()
             GatewayConnection.loadValueSetsFromServer { list, err in
+                if err != nil { errorOccured = true }
                 group.leave()
-            }
+             }
             
             group.enter()
             GatewayConnection.loadRulesFromServer { list, err  in
-              CertLogicManager.shared.setRules(ruleList: rules)
-              group.leave()
+                if err != nil { errorOccured = true }
+                group.leave()
+                CertLogicManager.shared.setRules(ruleList: rules)
             }
-            
-            group.leave()
         }
+        group.wait()
         
         group.enter()
         revocationWorker.processReloadRevocations { error in
@@ -175,24 +227,145 @@ public class DCCDataCenter {
                 if case let .failedValidation(status: status) = err, status == 404 {
                     group.enter()
                     revocationWorker.processReloadRevocations { err in
-                        guard err == nil else {
-                            print("Backend error!!")
-                            return
-                        }
+                        if err != nil { errorOccured = true }
                         group.leave()
                     }
-                } else {
-                    group.leave()
                 }
-            } else {
-                group.leave()
+                errorOccured = true
             }
+            group.leave()
         }
         
         group.notify(queue: .main) {
             localDataManager.localData.lastFetch = Date()
-            center.post(name: Notification.Name("StopLoadingNotificationName"), object: nil, userInfo: nil )
-            saveLocalData(completion: completion)
+            
+            if errorOccured == true {
+                DispatchQueue.main.async {
+                    completion(.failure(.noInputData))
+                }
+            } else {
+                saveLocalData(completion: completion)
+            }
+        }
+    }
+}
+
+extension DCCDataCenter {
+    public class func prepareWalletLocalData(completion: @escaping DataCompletionHandler) {
+        let group = DispatchGroup()
+        group.enter()
+        var requestResult: DataOperationResult? = .success
+        
+        initializeAllWalletStorageData { result in
+            requestResult = result
+            CertLogicManager.shared.setRules(ruleList: rules)
+            group.leave()
+        }
+        group.wait()
+        
+        let shouldDownload = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
+        if !shouldDownload {
+            group.notify(queue: .main) {
+                completion(.success)
+            }
+
+        } else {
+            group.enter()
+            reloadWalletStorageData { result in
+                requestResult = result
+                group.leave()
+            }
+            group.wait()
+            
+            group.enter()
+            localDataManager.loadLocallyStoredData { result in
+                requestResult = result
+                CertLogicManager.shared.setRules(ruleList: rules)
+                group.leave()
+            }
+            group.notify(queue: .main) {
+                completion(requestResult)
+            }
+        }
+    }
+    
+    static func initializeAllWalletStorageData(completion: @escaping DataCompletionHandler) {
+        let group = DispatchGroup()
+        
+        group.enter()
+        localDataManager.loadLocallyStoredData { result in
+            CertLogicManager.shared.setRules(ruleList: rules)
+            group.leave()
+        }
+        group.wait()
+        
+        group.enter()
+        localImageManager.loadLocallyStoredData { result in
+          group.leave()
+        }
+        
+        group.enter()
+        GatewayConnection.lookup(certStrings: certStrings) { success, _, _ in
+            group.leave()
+        }
+        
+        group.notify(queue: .main) {
+            completion(.success)
+        }
+    }
+    
+    static func reloadWalletStorageData(completion: @escaping DataCompletionHandler) {
+        var errorOccured = false
+        
+        let group = DispatchGroup()
+        group.enter()
+        localDataManager.loadLocallyStoredData { result in
+            CertLogicManager.shared.setRules(ruleList: rules)
+            group.leave()
+        }
+        
+        group.wait()
+        
+        group.enter()
+        GatewayConnection.updateLocalDataStorage { err in
+            if err != nil { errorOccured = true }
+            group.leave()
+        }
+        
+        group.enter()
+        GatewayConnection.loadCountryList { list, err in
+            if err != nil { errorOccured = true }
+            group.leave()
+        }
+        
+        group.enter()
+        GatewayConnection.loadValueSetsFromServer { list, err in
+            if err != nil { errorOccured = true }
+            group.leave()
+        }
+        
+        group.enter()
+        GatewayConnection.lookup(certStrings: certStrings) { success, _, err in
+            if err != nil { errorOccured = true }
+          group.leave()
+        }
+        
+        group.enter()
+        GatewayConnection.loadRulesFromServer { list, err  in
+            if err != nil { errorOccured = true }
+          CertLogicManager.shared.setRules(ruleList: rules)
+          group.leave()
+        }
+        
+        group.notify(queue: .main) {
+            localDataManager.localData.lastFetch = Date()
+            if errorOccured == true {
+                DispatchQueue.main.async {
+                    completion(.failure(.noInputData))
+                }
+            } else {
+                saveLocalData(completion: completion)
+            }
         }
     }
 }

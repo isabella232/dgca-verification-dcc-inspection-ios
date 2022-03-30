@@ -45,6 +45,19 @@ public class LocalDataManager {
         }
     }
     
+    // MARK: - Certificates
+    public func add(_ cert: HCert, with tan: String?, completion: @escaping DataCompletionHandler) {
+        localData.certStrings.append(DatedCertString(date: Date(), certString: cert.fullPayloadString, storedTAN: tan, isRevoked: cert.isRevoked))
+        storage.save(localData, completion: completion)
+    }
+    
+    public func remove(withDate date: Date, completion: @escaping DataCompletionHandler) {
+      if let ind = localData.certStrings.firstIndex(where: { $0.date == date }) {
+          localData.certStrings.remove(at: ind)
+          storage.save(localData, completion: completion)
+      }
+    }
+
     // MARK: - Countries
     public func add(country: CountryModel) {
         if !localData.countryCodes.contains(where: { $0.code == country.code }) {
