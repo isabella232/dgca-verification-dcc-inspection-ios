@@ -26,6 +26,8 @@
 //
 
 import Foundation
+import DGCCoreLibrary
+import ASN1Decoder
 
 public extension X509 {
     static func checkisSuitable(cert: String, certType: HCertType) -> Bool{
