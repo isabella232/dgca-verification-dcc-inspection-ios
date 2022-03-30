@@ -262,40 +262,41 @@ public class DCCDataCenter {
 extension DCCDataCenter {
     public class func prepareWalletLocalData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
-        group.enter()
         var requestResult: DataOperationResult = .success
         
+        group.enter()
         initializeAllWalletStorageData { result in
             requestResult = result
             CertLogicManager.shared.setRules(ruleList: rules)
-            group.leave()
-        }
-        group.wait()
-        
-        let shouldDownload = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
-        if !shouldDownload {
-            group.notify(queue: .main) {
-                completion(.success)
+            
+            let shouldDownload = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
+            if !shouldDownload {
+                group.notify(queue: .main) {
+                    completion(.success)
+                }
+
+            } else {
+                group.enter()
+                reloadWalletStorageData { result in
+                    requestResult = result
+                    group.enter()
+                    localDataManager.loadLocallyStoredData { result in
+                        requestResult = result
+                        CertLogicManager.shared.setRules(ruleList: rules)
+                        group.leave()
+                    }
+
+                    group.leave()
+                }
             }
 
-        } else {
-            group.enter()
-            reloadWalletStorageData { result in
-                requestResult = result
-                group.leave()
-            }
-            group.wait()
-            
-            group.enter()
-            localDataManager.loadLocallyStoredData { result in
-                requestResult = result
-                CertLogicManager.shared.setRules(ruleList: rules)
-                group.leave()
-            }
-            group.notify(queue: .main) {
-                completion(requestResult)
-            }
+            group.leave()
         }
+        
+        group.notify(queue: .main) {
+            completion(requestResult)
+        }
+
     }
     
     public static func initializeAllWalletStorageData(completion: @escaping DataCompletionHandler) {
@@ -329,42 +330,41 @@ extension DCCDataCenter {
         group.enter()
         localDataManager.loadLocallyStoredData { result in
             CertLogicManager.shared.setRules(ruleList: rules)
+            
+            group.enter()
+            GatewayConnection.updateLocalDataStorage { err in
+                if err != nil { errorOccured = true }
+                group.leave()
+            }
+            
+            group.enter()
+            GatewayConnection.loadCountryList { list, err in
+                if err != nil { errorOccured = true }
+                group.leave()
+            }
+            
+            group.enter()
+            GatewayConnection.loadValueSetsFromServer { list, err in
+                if err != nil { errorOccured = true }
+                group.leave()
+            }
+            
+            group.enter()
+            GatewayConnection.lookup(certStrings: certStrings) { success, _, err in
+                if err != nil { errorOccured = true }
+              group.leave()
+            }
+            
+            group.enter()
+            GatewayConnection.loadRulesFromServer { list, err  in
+                if err != nil { errorOccured = true }
+              CertLogicManager.shared.setRules(ruleList: rules)
+              group.leave()
+            }
+
             group.leave()
         }
-        
-        group.wait()
-        
-        group.enter()
-        GatewayConnection.updateLocalDataStorage { err in
-            if err != nil { errorOccured = true }
-            group.leave()
-        }
-        
-        group.enter()
-        GatewayConnection.loadCountryList { list, err in
-            if err != nil { errorOccured = true }
-            group.leave()
-        }
-        
-        group.enter()
-        GatewayConnection.loadValueSetsFromServer { list, err in
-            if err != nil { errorOccured = true }
-            group.leave()
-        }
-        
-        group.enter()
-        GatewayConnection.lookup(certStrings: certStrings) { success, _, err in
-            if err != nil { errorOccured = true }
-          group.leave()
-        }
-        
-        group.enter()
-        GatewayConnection.loadRulesFromServer { list, err  in
-            if err != nil { errorOccured = true }
-          CertLogicManager.shared.setRules(ruleList: rules)
-          group.leave()
-        }
-        
+    
         group.notify(queue: .main) {
             if errorOccured == true {
                 DispatchQueue.main.async {
