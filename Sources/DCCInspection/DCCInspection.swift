@@ -64,6 +64,6 @@ public final class DCCInspection: CertificateInspection {
     }
     
     public func reloadStorageData(completion: @escaping DataCompletionHandler) {
-        DCCDataCenter.reloadStorageData(completion: completion)
+        DCCDataCenter.reloadAllStorageData(completion: completion)
     }
 }
