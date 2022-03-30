@@ -306,7 +306,6 @@ extension DCCDataCenter {
             CertLogicManager.shared.setRules(ruleList: rules)
             group.leave()
         }
-        group.wait()
         
         group.enter()
         localImageManager.loadLocallyStoredData { result in
@@ -314,7 +313,7 @@ extension DCCDataCenter {
         }
         
         group.enter()
-        GatewayConnection.lookup(certStrings: certStrings) { success, _, _ in
+        GatewayConnection.lookup(certStrings: certStrings) { success, _, err in
             group.leave()
         }
         
