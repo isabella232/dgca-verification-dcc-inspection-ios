@@ -38,7 +38,7 @@ public struct AccessTokenResponse : Codable {
   let t             : Int?
   let v             : String?
   let confirmation  : String?
-  let vc            : ValidationCertificate?
+  public let vc     : ValidationCertificate?
   let result        : String?
   let results       : [LimitationInfo]?
 }

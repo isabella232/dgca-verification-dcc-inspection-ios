@@ -298,7 +298,7 @@ extension DCCDataCenter {
         }
     }
     
-    static func initializeAllWalletStorageData(completion: @escaping DataCompletionHandler) {
+    public static func initializeAllWalletStorageData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
         
         group.enter()
@@ -323,7 +323,7 @@ extension DCCDataCenter {
         }
     }
     
-    static func reloadWalletStorageData(completion: @escaping DataCompletionHandler) {
+    public static func reloadWalletStorageData(completion: @escaping DataCompletionHandler) {
         var errorOccured = false
         
         let group = DispatchGroup()
