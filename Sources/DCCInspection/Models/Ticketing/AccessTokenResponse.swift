@@ -29,18 +29,18 @@
 import Foundation
 
 public struct AccessTokenResponse : Codable {
-  let jti           : String?
-  let lss           : String?
-  let iat           : Int?
-  let sub           : String?
-  let aud           : String?
-  let exp           : Int?
-  let t             : Int?
-  let v             : String?
-  let confirmation  : String?
-  public let vc     : ValidationCertificate?
-  let result        : String?
-  let results       : [LimitationInfo]?
+    let jti           : String?
+    let lss           : String?
+    let iat           : Int?
+    let sub           : String?
+    let aud           : String?
+    let exp           : Int?
+    let t             : Int?
+    let v             : String?
+    let confirmation  : String?
+    public let vc     : ValidationCertificate?
+    public let result : String?
+    public let results: [LimitationInfo]?
 }
 
 public struct LimitationInfo : Codable {
