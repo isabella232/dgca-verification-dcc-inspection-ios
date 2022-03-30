@@ -261,13 +261,22 @@ public class DCCDataCenter {
 
 extension DCCDataCenter {
     public class func prepareWalletLocalData(completion: @escaping DataCompletionHandler) {
-        let localGroup = DispatchGroup()
-        localGroup.enter()
         var requestResult: DataOperationResult = .success
         
-        initializeAllWalletStorageData { result in
-            requestResult = result
+        let localGroup = DispatchGroup()
+        localGroup.enter()
+        localDataManager.loadLocallyStoredData { result in
             CertLogicManager.shared.setRules(ruleList: rules)
+            localGroup.leave()
+        }
+        
+        localGroup.enter()
+        localImageManager.loadLocallyStoredData { result in
+            localGroup.leave()
+        }
+        
+        localGroup.enter()
+        GatewayConnection.lookup(certStrings: certStrings) { success, _, err in
             localGroup.leave()
         }
         localGroup.wait()
@@ -280,8 +289,41 @@ extension DCCDataCenter {
 
         } else {
             localGroup.enter()
-            reloadWalletStorageData { result in
-                requestResult = result
+            localDataManager.loadLocallyStoredData { result in
+                CertLogicManager.shared.setRules(ruleList: rules)
+                localGroup.leave()
+            }
+            
+            localGroup.wait()
+            
+            localGroup.enter()
+            GatewayConnection.updateLocalDataStorage { err in
+                if err != nil { errorOccured = true }
+                localGroup.leave()
+            }
+            
+            localGroup.enter()
+            GatewayConnection.loadCountryList { list, err in
+                if err != nil { errorOccured = true }
+                localGroup.leave()
+            }
+            
+            localGroup.enter()
+            GatewayConnection.loadValueSetsFromServer { list, err in
+                if err != nil { errorOccured = true }
+                localGroup.leave()
+            }
+            
+            localGroup.enter()
+            GatewayConnection.lookup(certStrings: certStrings) { success, _, err in
+                if err != nil { errorOccured = true }
+                localGroup.leave()
+            }
+            
+            localGroup.enter()
+            GatewayConnection.loadRulesFromServer { list, err  in
+                if err != nil { errorOccured = true }
+                CertLogicManager.shared.setRules(ruleList: rules)
                 localGroup.leave()
             }
             localGroup.wait()
@@ -292,7 +334,11 @@ extension DCCDataCenter {
                 CertLogicManager.shared.setRules(ruleList: rules)
                 localGroup.leave()
             }
+            
             localGroup.notify(queue: .main) {
+                lastFetch = Date()
+                lastLaunchedAppVersion = Self.appVersion
+                saveLocalData(completion: completion)
                 completion(requestResult)
             }
         }
