@@ -32,7 +32,7 @@ import SwiftyJSON
 import CertLogic
 import JWTDecode
 
-enum GatewayError: Error {
+public enum GatewayError: Error {
   case insufficientData
   case encodingError
   case signingError
@@ -45,17 +45,17 @@ enum GatewayError: Error {
   case tokenError
 }
 
-typealias GatewayCompletion = (GatewayError?) -> Void
-typealias CertUpdateCompletion = (String?, String?, GatewayError?) -> Void
+public typealias GatewayCompletion = (GatewayError?) -> Void
+public typealias CertUpdateCompletion = (String?, String?, GatewayError?) -> Void
 
-typealias CertStatusCompletion = ([String]?, GatewayError?) -> Void
-typealias ValueSetsCompletion = ([ValueSet]?, GatewayError?) -> Void
-typealias ValueSetCompletionHandler = (ValueSet?, GatewayError?) -> Void
-typealias RulesCompletion = ([Rule]?, GatewayError?) -> Void
-typealias RuleCompletionHandler = (Rule?, GatewayError?) -> Void
-typealias CountryCompletionHandler = ([CountryModel]?, GatewayError?) -> Void
+public typealias CertStatusCompletion = ([String]?, GatewayError?) -> Void
+public typealias ValueSetsCompletion = ([ValueSet]?, GatewayError?) -> Void
+public typealias ValueSetCompletionHandler = (ValueSet?, GatewayError?) -> Void
+public typealias RulesCompletion = ([Rule]?, GatewayError?) -> Void
+public typealias RuleCompletionHandler = (Rule?, GatewayError?) -> Void
+public typealias CountryCompletionHandler = ([CountryModel]?, GatewayError?) -> Void
 
-class GatewayConnection: ContextConnection {
+public class GatewayConnection: ContextConnection {
     static func certUpdate(resume resumeToken: String? = nil, completion: @escaping CertUpdateCompletion) {
         var headers = [String: String]()
         if let token = resumeToken {
@@ -162,7 +162,7 @@ class GatewayConnection: ContextConnection {
         }
     }
 
-    static var config: JSON {
+    public static var config: JSON {
         return DCCDataCenter.localDataManager.versionedConfig
     }
 }
@@ -462,10 +462,10 @@ extension GatewayConnection {
     }
 }
 
-typealias TicketingCompletion = (AccessTokenResponse?, GatewayError?) -> Void
-typealias ContextCompletion = (Bool, String?, GatewayError?) -> Void
+public typealias TicketingCompletion = (AccessTokenResponse?, GatewayError?) -> Void
+public typealias ContextCompletion = (Bool, String?, GatewayError?) -> Void
 
-extension GatewayConnection {
+public extension GatewayConnection {
     static func loadAccessToken(_ url : URL, servicePath : String, publicKey: String, completion: @escaping TicketingCompletion) {
         let json: [String: Any] = ["service": servicePath, "pubKey": publicKey]
         
@@ -555,5 +555,4 @@ extension GatewayConnection {
         })
         session.resume()
     }
-
 }

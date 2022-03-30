@@ -28,7 +28,7 @@
 
 import Foundation
 
-struct CertificateRecord {
-  let keyName: String
-  let value: String
+public struct CertificateRecord {
+    public let keyName: String
+    public let value: String
 }

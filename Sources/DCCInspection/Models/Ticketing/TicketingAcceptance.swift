@@ -31,11 +31,11 @@ import DGCCoreLibrary
 import CryptoSwift
 
 
-struct TicketingAcceptance {
-    let validationInfo: ServerListResponse
-    let accessInfo : AccessTokenResponse
+public struct TicketingAcceptance {
+    public let validationInfo: ServerListResponse
+    public let accessInfo : AccessTokenResponse
 
-    var certificateRecords: [CertificateRecord] {
+    public var certificateRecords: [CertificateRecord] {
       guard let vcValue = accessInfo.vc else { return [] }
       var records = [CertificateRecord]()
       records.append(CertificateRecord(keyName: "Name".localized, value: "\(vcValue.gnt) \(vcValue.fnt)"))
@@ -51,12 +51,12 @@ struct TicketingAcceptance {
       return records
     }
 
-    init(validationInfo: ServerListResponse, accessInfo: AccessTokenResponse) {
+    public init(validationInfo: ServerListResponse, accessInfo: AccessTokenResponse) {
         self.validationInfo = validationInfo
         self.accessInfo = accessInfo
     }
     
-    var ticketingCertificates: [DatedCertString] {
+    public var ticketingCertificates: [DatedCertString] {
       guard let validationCertificate = self.accessInfo.vc else { return [] }
         let givenName = validationCertificate.gnt
         let familyName = validationCertificate.fnt
@@ -76,7 +76,7 @@ struct TicketingAcceptance {
       return collectArray
     }
     
-    func requestGrandPermissions(for certificate: HCert, completion: @escaping TicketingCompletion) {
+    public func requestGrandPermissions(for certificate: HCert, completion: @escaping TicketingCompletion) {
       guard let urlPath = self.accessInfo.aud, let url = URL(string: urlPath) else { completion(nil, GatewayError.insufficientData); return }
       guard let tokenData = SecureKeyChain.load(key: SharedConstants.keyXnonce) else { completion(nil, GatewayError.tokenError); return }
       guard let privateKey = Enclave.loadOrGenerateKey(with: "validationKey") else { completion(nil, GatewayError.privateKeyError); return }

@@ -28,31 +28,31 @@ import Foundation
 import CertLogic
 import DGCCoreLibrary
 
-class CertLogicManager {
-    static let shared = CertLogicManager()
+public class CertLogicManager {
+    public static let shared = CertLogicManager()
     
-    var certLogicEngine = CertLogicEngine(schema: euDgcSchemaV1, rules: [])
-    func setRules(ruleList: [Rule]) {
+    public var certLogicEngine = CertLogicEngine(schema: euDgcSchemaV1, rules: [])
+    public func setRules(ruleList: [Rule]) {
       certLogicEngine.updateRules(rules: ruleList)
     }
     
-    func validate(filter: FilterParameter, external: ExternalParameter, payload: String) -> [ValidationResult] {
+    public func validate(filter: FilterParameter, external: ExternalParameter, payload: String) -> [ValidationResult] {
       return certLogicEngine.validate(filter: filter, external: external, payload: payload)
     }
     
-    func validateIssuer(filter: FilterParameter, external: ExternalParameter, payload: String) -> [ValidationResult] {
+    public func validateIssuer(filter: FilterParameter, external: ExternalParameter, payload: String) -> [ValidationResult] {
       return certLogicEngine.validate(filter: filter, external: external, payload: payload, validationType: .issuer)
     }
     
-    func validateDestination(filter: FilterParameter, external: ExternalParameter, payload: String) -> [ValidationResult] {
+    public func validateDestination(filter: FilterParameter, external: ExternalParameter, payload: String) -> [ValidationResult] {
       return certLogicEngine.validate(filter: filter, external: external, payload: payload, validationType: .destination)
     }
     
-    func validateTraveller(filter: FilterParameter, external: ExternalParameter, payload: String) -> [ValidationResult] {
+    public func validateTraveller(filter: FilterParameter, external: ExternalParameter, payload: String) -> [ValidationResult] {
       return certLogicEngine.validate(filter: filter, external: external, payload: payload, validationType: .traveller)
     }
     
-    func getRuleDetailsError(rule: Rule, filter: FilterParameter) -> Dictionary<String, String> {
+    public func getRuleDetailsError(rule: Rule, filter: FilterParameter) -> Dictionary<String, String> {
       return certLogicEngine.getDetailsOfError(rule: rule, filter: filter)
     }
 }
