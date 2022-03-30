@@ -254,7 +254,7 @@ extension DCCDataCenter {
     public class func prepareWalletLocalData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
         group.enter()
-        var requestResult: DataOperationResult? = .success
+        var requestResult: DataOperationResult = .success
         
         initializeAllWalletStorageData { result in
             requestResult = result
