@@ -29,7 +29,7 @@
 import Foundation
 
 public enum SharedConstants {
-    static let expiredDataInterval: TimeInterval = 12.0 * 60 * 60
+    public static let expiredDataInterval: TimeInterval = 12.0 * 60 * 60
     static let dataStorageName = "secure_storage"
     static let imageStorageName = "images_secure"
 
