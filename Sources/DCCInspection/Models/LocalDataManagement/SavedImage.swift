@@ -35,11 +35,11 @@ public class SavedImage: Codable {
     public var imageString: String
     public var date: Date
 
-    var image: UIImage? {
+    public var image: UIImage? {
         get { return imageString.convertBase64StringToImage() }
     }
     
-    var dateString: String {
+    public var dateString: String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .long
         dateFormatter.timeStyle = .short

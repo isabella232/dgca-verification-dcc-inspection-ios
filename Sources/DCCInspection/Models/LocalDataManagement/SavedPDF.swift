@@ -31,48 +31,48 @@ import PDFKit
 
 public class SavedPDF: Codable {
   
-  public var identifier: String
-  public var fileName: String
-  public var pdfData: Data?
-  public var date: Date
+    public var identifier: String
+    public var fileName: String
+    public var pdfData: Data?
+    public var date: Date
 
-  var pdf: PDFDocument? {
-    get { return PDFDocument(data: pdfData ?? Data()) }
-  }
+    public var pdf: PDFDocument? {
+        return PDFDocument(data: pdfData ?? Data())
+    }
   
-  var dateString: String {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateStyle = .long
-    dateFormatter.timeStyle = .short
-    return dateFormatter.string(from: date)
-  }
+    public var dateString: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .long
+        dateFormatter.timeStyle = .short
+        return dateFormatter.string(from: date)
+    }
     
-  enum CodingKeys: String, CodingKey {
-    case identifier, fileName, pdfData, date
-  }
-  
-  // Init with custom fields
-  public init( fileName: String, pdfUrl: URL) {
-    self.identifier = UUID().uuidString
-    self.fileName = fileName
-    self.pdfData = try? Data(contentsOf: pdfUrl, options: .mappedIfSafe)
-    self.date = Date()
-  }
-  
+    enum CodingKeys: String, CodingKey {
+        case identifier, fileName, pdfData, date
+    }
+
+    // Init with custom fields
+    public init( fileName: String, pdfUrl: URL) {
+        self.identifier = UUID().uuidString
+        self.fileName = fileName
+        self.pdfData = try? Data(contentsOf: pdfUrl, options: .mappedIfSafe)
+        self.date = Date()
+    }
+
   // Init Rule from JSON Data
-  required public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    identifier = try container.decode(String.self, forKey: .identifier)
-    fileName = try container.decode(String.self, forKey: .fileName)
-    pdfData = try container.decode(Data.self, forKey: .pdfData)
-    date = try container.decode(Date.self, forKey: .date)
-  }
-  
-  public func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(identifier, forKey: .identifier)
-    try container.encode(fileName, forKey: .fileName)
-    try container.encode(pdfData, forKey: .pdfData)
-    try container.encode(date, forKey: .date)
-  }
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        identifier = try container.decode(String.self, forKey: .identifier)
+        fileName = try container.decode(String.self, forKey: .fileName)
+        pdfData = try container.decode(Data.self, forKey: .pdfData)
+        date = try container.decode(Date.self, forKey: .date)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(identifier, forKey: .identifier)
+        try container.encode(fileName, forKey: .fileName)
+        try container.encode(pdfData, forKey: .pdfData)
+        try container.encode(date, forKey: .date)
+    }
 }
