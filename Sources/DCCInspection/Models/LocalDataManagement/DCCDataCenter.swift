@@ -36,7 +36,8 @@ public class DCCDataCenter {
         let buildNumValue = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "?.?.?"
         return "\(versionValue)(\(buildNumValue))"
     }
-    static let localDataManager: LocalDataManager = LocalDataManager()
+        
+    public static let localDataManager: LocalDataManager = LocalDataManager()
     static let localImageManager: LocalImageManager = LocalImageManager()
     static let revocationWorker: RevocationWorker = RevocationWorker()
     

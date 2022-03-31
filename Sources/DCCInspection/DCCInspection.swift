@@ -44,7 +44,9 @@ public final class DCCInspection {
     static var publicKeyEncoder: PublicKeyStorageDelegate?
     static var config = HCertConfig.default
     
-    public init() { }
+    
+    public init() {
+    }
     
     public func verifyCert() { }
     
