@@ -36,15 +36,14 @@ public class DCCDataCenter {
         let buildNumValue = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "?.?.?"
         return "\(versionValue)(\(buildNumValue))"
     }
-    public static let localDataManager: LocalDataManager = LocalDataManager()
-    public static let localImageManager: LocalImageManager = LocalImageManager()
-
-    public static let revocationWorker: RevocationWorker = RevocationWorker()
+    static let localDataManager: LocalDataManager = LocalDataManager()
+    static let localImageManager: LocalImageManager = LocalImageManager()
+    static let revocationWorker: RevocationWorker = RevocationWorker()
     
     public static var downloadedDataHasExpired: Bool {
         return lastFetch.timeIntervalSinceNow < -SharedConstants.expiredDataInterval
     }
-   
+    
     public static var appWasRunWithOlderVersion: Bool {
         return localDataManager.localData.lastLaunchedAppVersion != appVersion
     }
@@ -57,7 +56,7 @@ public class DCCDataCenter {
             localDataManager.localData.lastLaunchedAppVersion = newValue
         }
     }
-
+    
     public static var lastFetch: Date {
         get {
             return localDataManager.localData.lastFetch
@@ -93,7 +92,7 @@ public class DCCDataCenter {
             localDataManager.localData.encodedPublicKeys = newValue
         }
     }
-
+    
     public static var countryCodes: [CountryModel] {
         get {
             return localDataManager.localData.countryCodes
@@ -102,7 +101,7 @@ public class DCCDataCenter {
             localDataManager.localData.countryCodes = newValue
         }
     }
-
+    
     public static var rules: [Rule] {
         get {
           return localDataManager.localData.rules
@@ -156,7 +155,7 @@ public class DCCDataCenter {
         list.forEach { localDataManager.add(country: $0) }
     }
 
-    public static func prepareVerifierLocalData(completion: @escaping DataCompletionHandler) {
+    static func prepareVerifierLocalData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
         group.enter()
         localDataManager.loadLocallyStoredData { result in
@@ -169,7 +168,7 @@ public class DCCDataCenter {
         let shouldReloadData = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
         
         if areNotDownloadedData || shouldReloadData {
-            reloadAllStorageData { result in
+            reloadVerifierStorageData { result in
                 if case .failure(_) = result {
                     if areNotDownloadedData {
                         completion(.noData)
@@ -260,12 +259,12 @@ public class DCCDataCenter {
 }
 
 extension DCCDataCenter {
-    public class func prepareWalletLocalData(completion: @escaping DataCompletionHandler) {
+    static func prepareWalletLocalData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
         var requestResult: DataOperationResult = .success
         
         group.enter()
-        initializeAllWalletStorageData { result in
+        initializeWalletStorageData { result in
             requestResult = result
             CertLogicManager.shared.setRules(ruleList: rules)
             
@@ -298,7 +297,7 @@ extension DCCDataCenter {
         }
     }
     
-    public static func initializeAllWalletStorageData(completion: @escaping DataCompletionHandler) {
+    static func initializeWalletStorageData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
         
         group.enter()
@@ -322,7 +321,7 @@ extension DCCDataCenter {
         }
     }
     
-    public static func reloadWalletStorageData(completion: @escaping DataCompletionHandler) {
+    static func reloadWalletStorageData(completion: @escaping DataCompletionHandler) {
         var errorOccured = false
         
         let group = DispatchGroup()

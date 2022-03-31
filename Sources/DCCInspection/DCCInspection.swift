@@ -33,7 +33,7 @@ import AppKit
 
 import DGCCoreLibrary
 
-public final class DCCInspection: CertificateInspection {
+public final class DCCInspection {
     
     #if os(iOS)
     static var cachedQrCodes = SyncDict<UIImage>()
@@ -58,10 +58,9 @@ public final class DCCInspection: CertificateInspection {
         let builder = SectionBuilder(with: hCert, validity: validityState, for: appType)
         return builder
     }
-    
 }
 
-extension DCCInspection {
+extension DCCInspection: CertificateInspection {
     public func prepareLocallyStoredData(appType: AppType, completion: @escaping DataCompletionHandler) {
         switch appType {
         case .verifier:
@@ -80,6 +79,5 @@ extension DCCInspection {
         case .wallet:
             DCCDataCenter.reloadWalletStorageData(completion: completion)
         }
-
     }
 }
