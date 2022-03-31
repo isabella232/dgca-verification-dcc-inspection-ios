@@ -59,6 +59,9 @@ public final class DCCInspection: CertificateInspection {
         return builder
     }
     
+}
+
+extension DCCInspection {
     public func prepareLocallyStoredData(appType: AppType, completion: @escaping DataCompletionHandler) {
         switch appType {
         case .verifier:

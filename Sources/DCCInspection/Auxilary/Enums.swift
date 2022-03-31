@@ -43,11 +43,6 @@ public enum AttributeKey: String {
   case recoveryStatements
 }
 
-public enum AppType: Int {
-  case verifier
-  case wallet
-}
-
 public enum HCertType: String {
   case test
   case vaccine
