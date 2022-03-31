@@ -32,13 +32,12 @@ import CertLogic
 
 public class DCCDataCenter {
     public static var appVersion: String {
-        let versionValue = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "?.?.?"
-        let buildNumValue = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "?.?.?"
-        return "\(versionValue)(\(buildNumValue))"
+        return (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "?.?.?"
     }
     
     public static let localDataManager: LocalDataManager = LocalDataManager()
     public static let localImageManager: LocalImageManager = LocalImageManager()
+    
     static let revocationWorker: RevocationWorker = RevocationWorker()
     
     public static var downloadedDataHasExpired: Bool {
@@ -155,7 +154,10 @@ public class DCCDataCenter {
         localDataManager.localData.countryCodes.removeAll()
         list.forEach { localDataManager.add(country: $0) }
     }
+}
 
+// MARK: - loading Verifier Data
+extension DCCDataCenter {
     static func prepareVerifierLocalData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
         group.enter()
@@ -259,6 +261,7 @@ public class DCCDataCenter {
     }
 }
 
+// MARK: - loading Wallet Data
 extension DCCDataCenter {
     static func prepareWalletLocalData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
