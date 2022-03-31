@@ -30,7 +30,7 @@ import SwiftyJSON
 import DGCCoreLibrary
 
 public class ZipManager {
-    private let debugLevel
+    private let debugLevel: Int
     
     public init(debugLevel: Int) {
         self.debugLevel = debugLevel
@@ -41,24 +41,26 @@ public class ZipManager {
           try createCertificateFolder()
           
           switch debugLevel {
+          case 2:
+              try generateQRImage(cert)
+              try generateCOSESHABin(cert)
+              try generateCOSESHATxt(cert)
+              try generateCOSEBase64(cert)
+              try generatePayloadBase64(cert)
+              fallthrough
           case 1:
-            try generateQRImage(cert)
-            try generateCOSESHABin(cert)
-            try generateCOSESHATxt(cert)
-            try generateCOSEBase64(cert)
-            try generatePayloadBase64(cert)
-            fallthrough
-          case 1:
-            try generateQRSHABin(cert)
-            try generateQRSHATxt(cert)
-            fallthrough
+              try generateQRSHABin(cert)
+              try generateQRSHATxt(cert)
+              fallthrough
           case 0:
-            try generateVersion()
-            try generateReadme()
-            try generatePayloadSHABin(cert)
-            try generatePayloadSHATxt(cert)
-            try generateQRBase64(cert)
-            try generatePayloadJson(cert)
+              try generateVersion()
+              try generateReadme()
+              try generatePayloadSHABin(cert)
+              try generatePayloadSHATxt(cert)
+              try generateQRBase64(cert)
+              try generatePayloadJson(cert)
+          default:
+              ()
           }
           
           let certificateDirectoryURL = getCertificateDirectoryURL()
@@ -155,23 +157,23 @@ public class ZipManager {
           anonimzedJSON["nam"]["fnt"].string = anonimzedJSON["nam"]["fnt"].string?.replacingOccurrences(of: "[a-zA-Z]", with: "X", options: .regularExpression, range: nil)
           
           if let dob = anonimzedJSON["dob"].string {
-            var strchars = Array(dob)
-            strchars[5] = "9"
-            strchars[6] = "9"
-            strchars[8] = "9"
-            strchars[9] = "9"
-            let dobStringAnonimized = String(strchars)
-            anonimzedJSON["dob"].string = dobStringAnonimized
+              var strchars = Array(dob)
+              strchars[5] = "9"
+              strchars[6] = "9"
+              strchars[8] = "9"
+              strchars[9] = "9"
+              let dobStringAnonimized = String(strchars)
+              anonimzedJSON["dob"].string = dobStringAnonimized
           }
           
           if let dt = anonimzedJSON["v"]["dt"].string {
-            var strchars = Array(dt)
-            strchars[5] = "9"
-            strchars[6] = "9"
-            strchars[8] = "9"
-            strchars[9] = "9"
-            let dtStringAnonimized = String(strchars)
-            anonimzedJSON["v"]["dt"].string = dtStringAnonimized
+              var strchars = Array(dt)
+              strchars[5] = "9"
+              strchars[6] = "9"
+              strchars[8] = "9"
+              strchars[9] = "9"
+              let dtStringAnonimized = String(strchars)
+              anonimzedJSON["v"]["dt"].string = dtStringAnonimized
           }
           
           anonimzedJSON["ci"].string?.removeLast(26)
@@ -199,12 +201,12 @@ public class ZipManager {
 
     private func generateQRSHABin(_ certificate: HCert) throws {
         if let QRData = certificate.fullPayloadString.data(using: .ascii) {
-          let data = SHA256.digest(input: QRData as NSData)
-          do {
-            try writeDataToFile(data: data, filename: "QR-sha.bin")
-          } catch {
-            throw error
-          }
+            let data = SHA256.digest(input: QRData as NSData)
+            do {
+                try writeDataToFile(data: data, filename: "QR-sha.bin")
+            } catch {
+                throw error
+            }
         }
     }
 
@@ -214,9 +216,9 @@ public class ZipManager {
           
           let text = shaData.hexString + "\n"
           do {
-            try writeTextToFile(filename: "QR-sha.txt", text: text)
+              try writeTextToFile(filename: "QR-sha.txt", text: text)
           } catch {
-            throw error
+              throw error
           }
         }
     }
@@ -309,12 +311,12 @@ extension ZipManager {
     }
     
     fileprivate func deleteCertificateFolderAndZip() throws {
-      do {
-          try FileManager.default.removeItem(at: getCertificateDirectoryURL())
-          try FileManager.default.removeItem(at: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("archive.zip", isDirectory: false))
-      } catch {
-          throw error
-      }
+        do {
+            try FileManager.default.removeItem(at: getCertificateDirectoryURL())
+            try FileManager.default.removeItem(at: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent("archive.zip", isDirectory: false))
+        } catch {
+            throw error
+        }
     }
     
     fileprivate func writeTextToFile(filename: String,text: String) throws {
@@ -338,7 +340,6 @@ extension ZipManager {
             throw error
         }
     }
-    
     
     private func archiveFileDirectory(url: URL, to archiveName: String, completion: @escaping (URL?, Error?) -> Void) {
         let fileManager = FileManager.default
