@@ -59,11 +59,17 @@ public final class DCCInspection: CertificateInspection {
         return builder
     }
     
-    public func prepareLocalData(completion: @escaping DataCompletionHandler) {
-        DCCDataCenter.prepareLocalData(completion: completion)
+    public func prepareLocallyStoredData(appType: AppType, completion: @escaping DataCompletionHandler) {
+        switch appType {
+        case .verifier:
+            DCCDataCenter.prepareVerifierLocalData(completion: completion)
+
+        case .wallet:
+            DCCDataCenter.prepareWalletLocalData(completion: completion)
+        }
     }
     
-    public func reloadStorageData(completion: @escaping DataCompletionHandler) {
+    public func updateLocallyStoredData(appType: AppType, completion: @escaping DataCompletionHandler) {
         DCCDataCenter.reloadAllStorageData(completion: completion)
     }
 }

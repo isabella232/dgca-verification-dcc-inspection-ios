@@ -156,7 +156,7 @@ public class DCCDataCenter {
         list.forEach { localDataManager.add(country: $0) }
     }
 
-    public static func prepareLocalData(completion: @escaping DataCompletionHandler) {
+    public static func prepareVerifierLocalData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
         group.enter()
         localDataManager.loadLocallyStoredData { result in
@@ -274,7 +274,7 @@ extension DCCDataCenter {
                 group.notify(queue: .main) {
                     completion(.success)
                 }
-
+                
             } else {
                 group.enter()
                 reloadWalletStorageData { result in
@@ -285,18 +285,17 @@ extension DCCDataCenter {
                         CertLogicManager.shared.setRules(ruleList: rules)
                         group.leave()
                     }
-
+                    
                     group.leave()
                 }
             }
-
+            
             group.leave()
         }
         
         group.notify(queue: .main) {
             completion(requestResult)
         }
-
     }
     
     public static func initializeAllWalletStorageData(completion: @escaping DataCompletionHandler) {
