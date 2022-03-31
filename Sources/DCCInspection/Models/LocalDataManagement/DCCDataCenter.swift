@@ -196,7 +196,7 @@ public class DCCDataCenter {
         }
     }
 
-    static func reloadAllStorageData(completion: @escaping DataCompletionHandler) {
+    static func reloadVerifierStorageData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
                 
         var errorOccured = false

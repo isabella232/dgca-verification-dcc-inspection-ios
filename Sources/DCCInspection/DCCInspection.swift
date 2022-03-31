@@ -70,6 +70,13 @@ public final class DCCInspection: CertificateInspection {
     }
     
     public func updateLocallyStoredData(appType: AppType, completion: @escaping DataCompletionHandler) {
-        DCCDataCenter.reloadAllStorageData(completion: completion)
+        switch appType {
+        case .verifier:
+            DCCDataCenter.reloadVerifierStorageData(completion: completion)
+
+        case .wallet:
+            DCCDataCenter.reloadWalletStorageData(completion: completion)
+        }
+
     }
 }
