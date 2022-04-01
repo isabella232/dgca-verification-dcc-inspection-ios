@@ -102,3 +102,9 @@ public enum Icons: String {
   case limited = "\u{f128}"
   case error = "\u{f05e}"
 }
+
+var sliceType: SliceType = .VARHASHLIST
+
+enum SliceType: String {
+   case BLOOMFILTER, VARHASHLIST
+}

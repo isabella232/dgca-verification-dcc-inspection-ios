@@ -36,17 +36,17 @@ public enum DataBaseError: Error {
     case dataBaseError(error: NSError)
 }
 
-public typealias LoadingCompletion = ([NSManagedObject]?, DataBaseError?) -> Void
+typealias LoadingCompletion = ([NSManagedObject]?, DataBaseError?) -> Void
 
-public class RevocationCoreDataManager: NSObject {
+class RevocationCoreDataManager: NSObject {
         
-    public var managedContext: NSManagedObjectContext! = {
+    var managedContext: NSManagedObjectContext! = {
         return RevocationCoreDataStorage.shared.persistentContainer.viewContext
     }()
 
     
     // MARK: - Revocations
-    public func clearAllData() {
+    func clearAllData() {
         let fetchRequest = NSFetchRequest<Revocation>(entityName: "Revocation")
         
         do {
@@ -57,8 +57,10 @@ public class RevocationCoreDataManager: NSObject {
                 managedContext.delete(revocationObject)
                 print("Deleted Revocation \(kidStr ?? "")")
             }
-            RevocationCoreDataStorage.shared.saveContext()
-            
+            if !revocations.isEmpty {
+                RevocationCoreDataStorage.shared.saveContext()
+            }
+
         } catch let error as NSError {
             print("Could not fetch Revocations for deleting: \(error.localizedDescription)")
             return
@@ -68,7 +70,7 @@ public class RevocationCoreDataManager: NSObject {
         }
     }
     
-    public func loadRevocation(kid: String) -> Revocation? {
+    func loadRevocation(kid: String) -> Revocation? {
         let fetchRequest = NSFetchRequest<Revocation>(entityName: "Revocation")
         let predicate: NSPredicate = NSPredicate(format: "kid == %@", argumentArray: [kid])
         fetchRequest.predicate = predicate
@@ -92,7 +94,7 @@ public class RevocationCoreDataManager: NSObject {
         }
     }
 
-    public func removeRevocation(kid: String) {
+    func removeRevocation(kid: String) {
         let fetchRequest = NSFetchRequest<Revocation>(entityName: "Revocation")
         let predicate:  NSPredicate = NSPredicate(format: "kid == %@", argumentArray: [kid])
         fetchRequest.predicate = predicate
@@ -104,7 +106,9 @@ public class RevocationCoreDataManager: NSObject {
                 managedContext.delete(revocationObject)
                 print("Deleted Revocation \(kid)")
             }
-            RevocationCoreDataStorage.shared.saveContext()
+            if !revocations.isEmpty {
+                RevocationCoreDataStorage.shared.saveContext()
+            }
             
         } catch let error as NSError {
             print("Could not fetch Revocations for deleting: \(error.localizedDescription)")
@@ -115,7 +119,7 @@ public class RevocationCoreDataManager: NSObject {
         }
     }
     
-    public func currentRevocations() -> [Revocation] {
+    func currentRevocations() -> [Revocation] {
         let fetchRequest = NSFetchRequest<Revocation>(entityName: "Revocation")
         do {
             let revocations = try managedContext.fetch(fetchRequest)
@@ -131,7 +135,7 @@ public class RevocationCoreDataManager: NSObject {
         }
     }
     
-    public func createAndSaveRevocations(_ models: [RevocationModel]) {
+    func createAndSaveRevocations(_ models: [RevocationModel]) {
         for model in models {
             let kid = model.kid
              
@@ -151,11 +155,12 @@ public class RevocationCoreDataManager: NSObject {
             }
             print("-- Added Revocation with KID: \(kid)")
         }
-        
-        RevocationCoreDataStorage.shared.saveContext()
+        if !models.isEmpty {
+            RevocationCoreDataStorage.shared.saveContext()
+        }
     }
 
-    public func saveMetadataHashes(sliceHashes: [SliceMetaData]) {
+    func saveMetadataHashes(sliceHashes: [SliceMetaData]) {
         for dataSliceModel in sliceHashes {
             let kid =  dataSliceModel.kid
             guard let sliceObject = loadSlice(kid: kid, id: dataSliceModel.id,
@@ -164,11 +169,13 @@ public class RevocationCoreDataManager: NSObject {
             let generatedData = dataSliceModel.contentData
             sliceObject.setValue(generatedData, forKey: "hashData")
         }
-
-        RevocationCoreDataStorage.shared.saveContext()
+        if !sliceHashes.isEmpty {
+            RevocationCoreDataStorage.shared.saveContext()
+        }
     }
 
-    public func deleteExpiredRevocations(for date: Date) {
+    func deleteExpiredRevocations() {
+        let date = Date()
         let fetchRequest = NSFetchRequest<Revocation>(entityName: "Revocation")
         let predicate:  NSPredicate = NSPredicate(format: "expires < %@", argumentArray: [date])
         fetchRequest.predicate = predicate
@@ -176,9 +183,10 @@ public class RevocationCoreDataManager: NSObject {
             let revocations = try managedContext.fetch(fetchRequest)
             revocations.forEach { managedContext.delete($0) }
             print("-- Deleted \(revocations.count) revocations for expiredDate: \(date)")
+            if !revocations.isEmpty {
+                RevocationCoreDataStorage.shared.saveContext()
+            }
             
-            RevocationCoreDataStorage.shared.saveContext()
- 
         } catch let error as NSError {
             print("Could not fetch revocations. Error: \(error.localizedDescription) for expiredDate: \(date)")
             return
@@ -190,7 +198,7 @@ public class RevocationCoreDataManager: NSObject {
 
     // MARK: - Partitions
 
-    public func savePartitions(kid: String, models: [PartitionModel]) {
+    func savePartitions(kid: String, models: [PartitionModel]) {
         print("Start saving Partitions for kid: \(kid)")
         let revocation = loadRevocation(kid: kid)
         for model in models {
@@ -227,10 +235,12 @@ public class RevocationCoreDataManager: NSObject {
             partition.setValue(chunkParts, forKey: "chunks")
             partition.setValue(revocation, forKey: "revocation")
         }
-        RevocationCoreDataStorage.shared.saveContext()
+        if !models.isEmpty {
+            RevocationCoreDataStorage.shared.saveContext()
+        }
     }
     
-    public func createAndSaveChunk(kid: String, id: String, cid: String, sliceModel: [String : SliceModel]) {
+    func createAndSaveChunk(kid: String, id: String, cid: String, sliceModel: [String : SliceModel]) {
         let partition = loadPartition(kid: kid, id: id)
         let chunkEntity = NSEntityDescription.entity(forEntityName: "Chunk", in: managedContext)!
         let chunk = Chunk(entity: chunkEntity, insertInto: managedContext)
@@ -248,7 +258,7 @@ public class RevocationCoreDataManager: NSObject {
         RevocationCoreDataStorage.shared.saveContext()
     }
     
-    public func createAndSaveSlice(kid: String, id: String, cid: String, sliceKey: String, sliceModel: SliceModel) {
+    func createAndSaveSlice(kid: String, id: String, cid: String, sliceKey: String, sliceModel: SliceModel) {
         let chunk = loadChunk(kid: kid, id: id, cid: cid)
         let slice: Slice = createSlice(expDate: sliceKey, sliceModel: sliceModel)
         let slices = chunk?.value(forKey: "slices") as? NSMutableOrderedSet
@@ -259,7 +269,8 @@ public class RevocationCoreDataManager: NSObject {
     }
 
     
-    public func deleteExpiredPartitions(for date: Date) {
+    func deleteExpiredPartitions() {
+        let date = Date()
         let fetchRequest = NSFetchRequest<Partition>(entityName: "Partition")
         let predicate:  NSPredicate = NSPredicate(format: "expires < %@", argumentArray: [date])
         fetchRequest.predicate = predicate
@@ -267,8 +278,9 @@ public class RevocationCoreDataManager: NSObject {
             let partitions = try managedContext.fetch(fetchRequest)
             partitions.forEach { managedContext.delete($0) }
             print("  Deleted \(partitions.count) partitions for expiredDate: \(date)")
-            
-            RevocationCoreDataStorage.shared.saveContext()
+            if !partitions.isEmpty {
+                RevocationCoreDataStorage.shared.saveContext()
+            }
             
         } catch let error as NSError {
             print("Could not fetch revocations. Error: \(error.localizedDescription) for expiredDate: \(date)")
@@ -279,7 +291,7 @@ public class RevocationCoreDataManager: NSObject {
         }
     }
     
-    public func deletePartition(kid: String, id: String) {
+    func deletePartition(kid: String, id: String) {
         let fetchRequest = NSFetchRequest<Partition>(entityName: "Partition")
         let predicate: NSPredicate = NSPredicate(format: "kid == %@ AND id == %@", argumentArray: [kid, id])
         fetchRequest.predicate = predicate
@@ -288,8 +300,10 @@ public class RevocationCoreDataManager: NSObject {
             partitions.forEach { managedContext.delete($0) }
             print("  Deleted \(partitions.count) partitions for id: \(id)")
             
-            RevocationCoreDataStorage.shared.saveContext()
-            
+            if !partitions.isEmpty {
+                RevocationCoreDataStorage.shared.saveContext()
+            }
+
         } catch let error as NSError {
             print("Could not fetch revocations. Error: \(error.localizedDescription) for expiredDate: \(id)")
             return
@@ -299,17 +313,17 @@ public class RevocationCoreDataManager: NSObject {
         }
     }
   
-    public func deleteChunk(_ chunk: Chunk) {
+    func deleteChunk(_ chunk: Chunk) {
         managedContext.delete(chunk)
         RevocationCoreDataStorage.shared.saveContext()
     }
 
-    public func deleteSlice(_ slice: Slice) {
+    func deleteSlice(_ slice: Slice) {
         managedContext.delete(slice)
         RevocationCoreDataStorage.shared.saveContext()
     }
 
-    public func deleteSlice(kid: String, id: String, cid: String, hashID: String) {
+    func deleteSlice(kid: String, id: String, cid: String, hashID: String) {
         let fetchRequest = NSFetchRequest<Slice>(entityName: "Slice")
         let predicate = NSPredicate(format: "chunk.partition.kid == %@ AND chunk.partition.id == %@ AND chunk.id == %@ AND hashID == %@",
             argumentArray: [kid, id, cid, hashID])
@@ -319,7 +333,9 @@ public class RevocationCoreDataManager: NSObject {
             slices.forEach { managedContext.delete($0) }
             print("-- Deleted \(slices.count) slices for id: \(hashID)")
             
-            RevocationCoreDataStorage.shared.saveContext()
+            if !slices.isEmpty {
+                RevocationCoreDataStorage.shared.saveContext()
+            }
             
         } catch let error as NSError {
             print("Could not fetch slices. Error: \(error.localizedDescription) for expiredDate: \(id)")
@@ -331,7 +347,7 @@ public class RevocationCoreDataManager: NSObject {
     }
 
     
-    public func loadAllPartitions(for kid: String) -> [Partition]? {
+    func loadAllPartitions(for kid: String) -> [Partition]? {
         let fetchRequest = NSFetchRequest<Partition>(entityName: "Partition")
         let predicate: NSPredicate = NSPredicate(format: "kid == %@", argumentArray: [kid])
         fetchRequest.predicate = predicate
@@ -349,7 +365,7 @@ public class RevocationCoreDataManager: NSObject {
         }
     }
     
-    public func loadPartition(kid: String, id: String) -> Partition? {
+    func loadPartition(kid: String, id: String) -> Partition? {
         let fetchRequest = NSFetchRequest<Partition>(entityName: "Partition")
         let predicate: NSPredicate = NSPredicate(format: "kid == %@ AND id == %@", argumentArray: [kid, id])
         fetchRequest.predicate = predicate
@@ -368,12 +384,12 @@ public class RevocationCoreDataManager: NSObject {
         }
     }
 
-    public func loadChunk(kid: String, id: String, cid: String) -> Chunk? {
+    func loadChunk(kid: String, id: String, cid: String) -> Chunk? {
+        let today = Date()
         let fetchRequest = NSFetchRequest<Chunk>(entityName: "Chunk")
-        let predicate: NSPredicate = NSPredicate(format: "partition.kid == %@ AND partition.id == %@ AND cid == %@",
-            argumentArray: [kid, id, cid])
-        fetchRequest.predicate = predicate
+        let predicate: NSPredicate = NSPredicate(format: "partition.kid == %@ AND chunk.partition.expired > %@ AND partition.id == %@ AND cid == %@", argumentArray: [kid, today, id, cid])
         
+        fetchRequest.predicate = predicate
         do {
             let chunks = try managedContext.fetch(fetchRequest)
             print("== Extracted \(chunks.count) chunk(s) for kid: \(kid), pid: \(id), cid: \(cid)")
@@ -387,12 +403,13 @@ public class RevocationCoreDataManager: NSObject {
         }
     }
 
-    public func loadSlice(kid: String, id: String, cid: String, hashID: String) -> Slice? {
+    func loadSlice(kid: String, id: String, cid: String, hashID: String) -> Slice? {
         let fetchRequest = NSFetchRequest<Slice>(entityName: "Slice")
-        let predicate: NSPredicate = NSPredicate(format: "chunk.partition.kid == %@ AND chunk.partition.id == %@ AND chunk.cid == %@ AND hashID == %@",
-            argumentArray: [kid, id, cid, hashID])
-        fetchRequest.predicate = predicate
+        let today = Date()
+
+        let predicate: NSPredicate = NSPredicate(format: "chunk.partition.kid == %@ AND chunk.partition.expired > %@ AND chunk.partition.id == %@ AND chunk.cid == %@ AND hashID == %@ AND expiredDate > %@", argumentArray: [kid, today, id, cid, hashID, today])
         
+        fetchRequest.predicate = predicate
         do {
             let slices = try managedContext.fetch(fetchRequest)
             print("== Extracted \(slices.count) slice(s) for kid: \(kid), pid: \(id), cid: \(cid), sid: \(hashID)")
@@ -407,13 +424,12 @@ public class RevocationCoreDataManager: NSObject {
     }
     
     // MARK: - Chunks & Slices
-    public func loadSlices(kid: String, x: String, y: String, section cid: String) -> [Slice]? {
+    func loadSlices(kid: String, x: String, y: String, section cid: String) -> [Slice]? {
         let fetchRequest = NSFetchRequest<Slice>(entityName: "Slice")
-        let predicate = NSPredicate(format: "chunk.partition.kid == %@ AND chunk.partition.x == %@ AND chunk.partition.y == %@ AND chunk.cid == %@",
-            argumentArray: [kid, x, y, cid])
+        let today = Date()
+        let predicate = NSPredicate(format: "chunk.partition.kid == %@ AND chunk.partition.expired > %@ AND chunk.partition.x == %@ AND chunk.partition.y == %@ AND chunk.cid == %@ AND expiredDate > %@", argumentArray: [kid, today, x, y, cid, today])
         
         fetchRequest.predicate = predicate
-        
         do {
             let slices = try managedContext.fetch(fetchRequest)
             print("== Extracted \(slices.count) slices for kid: \(kid), x: \(x), y: \(y)")

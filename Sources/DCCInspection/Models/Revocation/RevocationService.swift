@@ -28,6 +28,9 @@
 import Foundation
 import DGCCoreLibrary
 
+import Foundation
+
+
 public enum RevocationError: Error {
     case unauthorized // TODO - add  unauthorized(error: NSError?)
     case invalidID
@@ -74,29 +77,29 @@ public final class RevocationService: RevocationServiceProtocol {
     // description: Returns a list of all available partitions.
     // paths:  /lists/{kid}/partitions (get)
     
-    public func getRevocationPartitions(for kid: String, completion: @escaping PartitionListCompletion) {
+    public func getRevocationPartitions(for kid: String, dateString dateStr: String?, completion: @escaping PartitionListCompletion) {
         let partitionComponent = String(format: ServiceConfig.linkForPartitions.rawValue, kid)
         let path = baseServiceURLPath + partitionComponent
         guard let etagData = SecureKeyChain.load(key: "verifierETag") else { return }
         let eTag = String(decoding: etagData, as: UTF8.self)
-        guard let request = RequestFactory.serviceGetRequest(path: path, etag: eTag) else {
+        guard let request = RequestFactory.serviceGetRequest(path: path, etag: eTag, dateStr: dateStr) else {
             completion(nil, nil, .badRequest(path: path))
             return
         }
         self.startJSONDataTask(for: request, completion: completion)
     }
-
+    
     // MARK: - Partitions Lists with ID
     // summary: Returns for the selected kid a Partition
     // description: Returns a Partition by Id
     // paths:  /lists/{kid}/partitions/{id}: (get)
     
-    public func getRevocationPartitions(for kid: String, id: String, completion: @escaping PartitionListCompletion) {
+    public func getRevocationPartitions(for kid: String, id: String, dateString dateStr: String?, completion: @escaping PartitionListCompletion) {
         let partitionIDComponent = String(format: ServiceConfig.linkForPartitionsWithID.rawValue, kid, id)
         let path = baseServiceURLPath + partitionIDComponent
         guard let etagData = SecureKeyChain.load(key: "verifierETag") else { return }
         let eTag = String(decoding: etagData, as: UTF8.self)
-        guard let request = RequestFactory.serviceGetRequest(path: path, etag: eTag) else {
+        guard let request = RequestFactory.serviceGetRequest(path: path, etag: eTag, dateStr: dateStr) else {
             completion(nil, nil, .badRequest(path: path))
             return
         }
@@ -107,8 +110,8 @@ public final class RevocationService: RevocationServiceProtocol {
     // summary: Returns for the selected partition all chunks.
     // description: Returns a Partition by Id
     // paths:  /lists/{kid}/partitions/{id}/chunks   (post)
-
-    public func getRevocationPartitionChunks(for kid: String, id: String, cids: [String]? = nil, completion: @escaping ZIPDataTaskCompletion) {
+    
+    public func getRevocationPartitionChunks(for kid: String, id: String, cids: [String]? = nil, dateString dateStr: String?, completion: @escaping ZIPDataTaskCompletion) {
         let partitionIDComponent = String(format: ServiceConfig.linkForPartitionChunks.rawValue, kid, id)
         let path = baseServiceURLPath + partitionIDComponent
         guard let etagData = SecureKeyChain.load(key: "verifierETag") else { return }
@@ -117,7 +120,7 @@ public final class RevocationService: RevocationServiceProtocol {
         let encoder = JSONEncoder()
         let postData = cids == nil ? try? encoder.encode(allChunks) : try? encoder.encode(cids!)
         
-        guard let request = RequestFactory.servicePostRequest(path: path, body: postData, etag: eTag) else {
+        guard let request = RequestFactory.servicePostRequest(path: path, body: postData, etag: eTag, dateStr: dateStr) else {
             completion(nil, .badRequest(path: path))
             return
         }
@@ -129,12 +132,12 @@ public final class RevocationService: RevocationServiceProtocol {
     //description: Returns a Partition by Id
     // paths:  /lists/{kid}/partitions/{id}/chunks/{cid} (get)
     
-    public func getRevocationPartitionChunk(for kid: String, id: String, cid: String, completion: @escaping ZIPDataTaskCompletion) {
+    public func getRevocationPartitionChunk(for kid: String, id: String, cid: String, dateString dateStr: String?, completion: @escaping ZIPDataTaskCompletion) {
         let partitionIDComponent = String(format: ServiceConfig.linkForChunkSlices.rawValue, kid, id, cid)
         let path = baseServiceURLPath + partitionIDComponent
         guard let etagData = SecureKeyChain.load(key: "verifierETag") else { return }
         let eTag = String(decoding: etagData, as: UTF8.self)
-        guard let request = RequestFactory.serviceGetRequest(path: path, etag: eTag) else {
+        guard let request = RequestFactory.serviceGetRequest(path: path, etag: eTag, dateStr: dateStr) else {
             completion(nil, .badRequest(path: path))
             return
         }
@@ -146,7 +149,7 @@ public final class RevocationService: RevocationServiceProtocol {
     // description: Returns a Partition by Id
     // paths:  /lists/{kid}/partitions/{id}/chunks/{cid}/slice   (post)
 
-    public func getRevocationPartitionChunkSlice(for kid: String, id: String, cid: String, sids: [String]?,
+    public func getRevocationPartitionChunkSlice(for kid: String, id: String, cid: String, sids: [String]?, dateString dateStr: String?,
             completion: @escaping ZIPDataTaskCompletion) {
         let partitionIDComponent = String(format: ServiceConfig.linkForChunkSlices.rawValue, kid, id, cid)
         let path = baseServiceURLPath + partitionIDComponent
@@ -156,7 +159,7 @@ public final class RevocationService: RevocationServiceProtocol {
         let encoder = JSONEncoder()
         let postData = try? encoder.encode(sids)
         
-        guard let request = RequestFactory.servicePostRequest(path: path, body: postData, etag: eTag) else {
+        guard let request = RequestFactory.servicePostRequest(path: path, body: postData, etag: eTag, dateStr: dateStr) else {
             completion(nil, .badRequest(path: path))
             return
         }
@@ -168,13 +171,13 @@ public final class RevocationService: RevocationServiceProtocol {
     //description: Returns a Partition by Id
     // paths:  /lists/{kid}/partitions/{id}/chunks/{cid}/slice/{sid} (get)
     
-    public func getRevocationPartitionChunkSliceSingle(for kid: String, id: String, cid: String, sid: String,
+    public func getRevocationPartitionChunkSliceSingle(for kid: String, id: String, cid: String, sid: String, dateString dateStr: String?,
             completion: @escaping ZIPDataTaskCompletion) {
         let partitionIDComponent = String(format: ServiceConfig.linkForSingleSlice.rawValue, kid, id, cid, sid)
         let path = baseServiceURLPath + partitionIDComponent
         guard let etagData = SecureKeyChain.load(key: "verifierETag") else { return }
         let eTag = String(decoding: etagData, as: UTF8.self)
-        guard let request = RequestFactory.serviceGetRequest(path: path, etag: eTag) else {
+        guard let request = RequestFactory.serviceGetRequest(path: path, etag: eTag, dateStr: dateStr) else {
             completion(nil, .badRequest(path: path))
             return
         }
@@ -184,15 +187,21 @@ public final class RevocationService: RevocationServiceProtocol {
     // private methods
     fileprivate func startJSONDataTask<T: Codable>(for request: URLRequest, completion: @escaping JSONDataTaskCompletion<T>) {
         let dataTask = session.dataTask(with: request) {[unowned self] (data, response, error) in
-            let httpResponse = response as! HTTPURLResponse
-            guard defaultResponseValidation(statusCode: httpResponse.statusCode) else {
-                completion(nil, nil, .failedValidation(status: httpResponse.statusCode))
-                return
-            }
             guard error == nil else {
                 completion(nil, nil, .network(reason: error!.localizedDescription))
                 return
             }
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                completion(nil, nil, .network(reason: "No HTTPURLResponse"))
+                return
+            }
+            
+            guard defaultResponseValidation(statusCode: httpResponse.statusCode) else {
+                completion(nil, nil, .failedValidation(status: httpResponse.statusCode))
+                return
+            }
+            
             guard let data = data else {
                 completion(nil, nil, .nodata)
                 return
