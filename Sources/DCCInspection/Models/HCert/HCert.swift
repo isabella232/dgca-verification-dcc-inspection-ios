@@ -31,6 +31,7 @@ import SwiftCBOR
 import DGCCoreLibrary
 
 public class HCert: CertificateApplication, Codable {
+    
     public let fullPayloadString: String
     public let payloadString: String
     public let cborData: Data
@@ -158,7 +159,7 @@ public class HCert: CertificateApplication, Codable {
     
     public static var clockOverride: Date?
 
-    public init(from payload: String, ruleCountryCode: String? = nil) throws {
+    public required init(payload: String, ruleCountryCode: String?) throws {
         if HCertConfig.checkCH1PreffixExist(payload) {
             fullPayloadString = payload
             payloadString = HCertConfig.parsePrefix(payload)
