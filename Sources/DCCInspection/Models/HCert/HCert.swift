@@ -30,7 +30,7 @@ import JSONSchema
 import SwiftCBOR
 import DGCCoreLibrary
 
-public class HCert: CertificateApplication, Codable {
+public class HCert: CertificationProtocol, Codable {
     
     public let fullPayloadString: String
     public let payloadString: String
@@ -63,7 +63,7 @@ public class HCert: CertificateApplication, Codable {
     public var lastNameStandardized: String {
         return get(.lastNameStandardized).string ?? ""
     }
-
+    
     public var fullName: String {
         var fullName = ""
         fullName = fullName + firstName.replacingOccurrences(of: "<",
