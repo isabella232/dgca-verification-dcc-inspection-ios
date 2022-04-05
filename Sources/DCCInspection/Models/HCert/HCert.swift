@@ -159,7 +159,7 @@ public class HCert: CertificationProtocol, Codable {
     
     public static var clockOverride: Date?
 
-    public required init(payload: String, ruleCountryCode: String?) throws {
+    public required init(payload: String, ruleCountryCode: String? = nil) throws {
 		var copyPayload = payload
 		self.isRevoked = false
 		if let firstChar = payload.first {
