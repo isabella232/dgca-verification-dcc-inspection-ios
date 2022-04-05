@@ -41,10 +41,8 @@ public extension ValidityState {
             return Icons.ok.rawValue
         case .invalid:
             return Icons.error.rawValue
-        case .ruleInvalid:
+        case .partlyValid:
             return Icons.limited.rawValue
-        case .revoked:
-            return Icons.error.rawValue
         }
     }
 
@@ -54,10 +52,8 @@ public extension ValidityState {
             return Icons.ok.rawValue
         case .invalid:
             return Icons.error.rawValue
-        case .ruleInvalid:
+        case .partlyValid:
             return Icons.limited.rawValue
-        case .revoked:
-            return Icons.error.rawValue
         }
     }
 
@@ -67,10 +63,8 @@ public extension ValidityState {
             return Icons.ok.rawValue
         case .invalid:
             return Icons.error.rawValue
-        case .ruleInvalid:
+        case .partlyValid:
             return Icons.limited.rawValue
-        case .revoked:
-            return Icons.error.rawValue
         }
     }
     
@@ -80,10 +74,8 @@ public extension ValidityState {
             return Icons.ok.rawValue
         case .invalid:
             return Icons.error.rawValue
-        case .ruleInvalid:
+        case .partlyValid:
             return Icons.limited.rawValue
-        case .revoked:
-            return Icons.error.rawValue
         }
     }
 
@@ -94,10 +86,8 @@ public extension ValidityState {
             return UIColor.certificateValid
         case .invalid:
             return UIColor.certificateInvalid
-        case .ruleInvalid:
+        case .partlyValid:
             return UIColor.certificateRuleOpen
-        case .revoked:
-            return UIColor.certificateInvalid
         }
     }
 
@@ -107,10 +97,8 @@ public extension ValidityState {
             return UIColor.certificateValid
         case .invalid:
             return UIColor.certificateInvalid
-        case .ruleInvalid:
+        case .partlyValid:
             return UIColor.certificateRuleOpen
-        case .revoked:
-            return UIColor.certificateInvalid
         }
     }
 
@@ -120,10 +108,8 @@ public extension ValidityState {
             return UIColor.certificateValid
         case .invalid:
             return UIColor.certificateInvalid
-        case .ruleInvalid:
+        case .partlyValid:
             return UIColor.certificateRuleOpen
-        case .revoked:
-            return UIColor.certificateInvalid
         }
     }
 
@@ -133,10 +119,8 @@ public extension ValidityState {
             return UIColor.certificateValid
         case .invalid:
             return UIColor.certificateInvalid
-        case .ruleInvalid:
+        case .partlyValid:
             return UIColor.certificateRuleOpen
-        case .revoked:
-            return UIColor.certificateInvalid
         }
     }
 #else

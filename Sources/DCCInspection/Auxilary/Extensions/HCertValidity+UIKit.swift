@@ -33,7 +33,7 @@ import AppKit
 #endif
 import DGCCoreLibrary
 
-public extension HCertValidity {
+public extension VerificationResult {
   
     var validityResult: String {
         switch self {
@@ -41,10 +41,10 @@ public extension HCertValidity {
             return "Valid".localized
         case .invalid:
             return "Invalid".localized
-        case .ruleInvalid:
+        case .partlyValid:
             return "Limited validity".localized
-        case .revoked:
-            return "Revoked".localized
+//        case .revoked:
+//            return "Revoked".localized
         }
     }
         
@@ -54,9 +54,7 @@ public extension HCertValidity {
             return "Done".localized
         case .invalid:
             return "Retry".localized
-        case .ruleInvalid:
-            return "Retry".localized
-        case .revoked:
+        case .partlyValid:
             return "Retry".localized
         }
     }
@@ -68,10 +66,8 @@ public extension HCertValidity {
             return UIImage(named: "check", in: .module, compatibleWith: nil)!
         case .invalid:
             return UIImage(named: "error", in: .module, compatibleWith: nil)!
-        case .ruleInvalid:
+        case .partlyValid:
             return UIImage(named: "check", in: .module, compatibleWith: nil)!
-        case .revoked:
-            return UIImage(named: "error", in: .module, compatibleWith: nil)!
         }
     }
 
@@ -81,10 +77,8 @@ public extension HCertValidity {
             return UIColor.certificateGreen
         case .invalid:
             return UIColor.certificateRed
-        case .ruleInvalid:
+        case .partlyValid:
             return UIColor.certificateLimited
-        case .revoked:
-            return UIColor.certificateRed
         }
     }
 #else
@@ -94,10 +88,8 @@ public extension HCertValidity {
             return NSImage(named: "check")!
         case .invalid:
             return NSImage(named: "error")!
-        case .ruleInvalid:
+        case .partlyValid:
             return NSImage(named: "check")!
-        case .revoked:
-            return NSImage(named: "error")!
         }
     }
     var validityBackground: NSColor {
@@ -106,10 +98,8 @@ public extension HCertValidity {
             return .green
         case .invalid:
             return .red
-        case .ruleInvalid:
+        case .partlyValid:
             return .yellow
-        case .revoked:
-            return .red
         }
     }
 #endif

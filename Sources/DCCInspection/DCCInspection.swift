@@ -63,6 +63,7 @@ public final class DCCInspection {
 }
 
 extension DCCInspection: CertificateInspection {
+    
     public func prepareLocallyStoredData(appType: AppType, completion: @escaping DataCompletionHandler) {
         switch appType {
         case .verifier:
@@ -81,5 +82,11 @@ extension DCCInspection: CertificateInspection {
         case .wallet:
             DCCDataCenter.reloadWalletStorageData(completion: completion)
         }
+    }
+    
+    public func validateCertificate(_ certificate: CertificationProtocol) -> CertificateVerifying {
+        let validator = DCCCertificateValidator(with: certificate as! HCert)
+        let validityState = validator.validateDCCCertificate()
+        return validityState
     }
 }
