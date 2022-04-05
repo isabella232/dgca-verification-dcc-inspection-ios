@@ -424,7 +424,7 @@ public extension GatewayConnection {
 				request.httpBody = try! JSONSerialization.data(withJSONObject: jwts)
 				AF.request(request).response {
 					guard
-						case .success(_) = $0.result,
+						case .success = $0.result,
 						let status = $0.response?.statusCode,
 						let response = try? JSONSerialization.jsonObject(with: $0.data ?? .init(), options: []) as? [String],
 						status / 100 == 2
@@ -434,14 +434,14 @@ public extension GatewayConnection {
 					}
 					if response.count == 0 { completion(true, nil, nil); return }
 					// response is list of hashes that have been revoked
-					var count = certs.count
+					
 					let revokedHashes = response as [String]
 					// identify all certs that have changed
 					var toBeChanged: [Date: HCert] = [:]
 					certs.forEach { date, cert in
-						if revokedHashes.contains(cert.uvciHash![0..<cert.uvciHash!.count/2].toHexString()) ||
-							revokedHashes.contains(cert.signatureHash![0..<cert.signatureHash!.count/2].toHexString()) ||
-							revokedHashes.contains(cert.countryCodeUvciHash![0..<cert.countryCodeUvciHash!.count/2].toHexString()) {
+						if revokedHashes.contains(cert.uvciHash!.dropLast(16).toHexString()) ||
+							revokedHashes.contains(cert.signatureHash!.dropLast(16).toHexString()) ||
+							revokedHashes.contains(cert.countryCodeUvciHash!.dropLast(16).toHexString()) {
 							cert.isRevoked = true
 							toBeChanged[date] = cert
 						} else {
@@ -451,10 +451,11 @@ public extension GatewayConnection {
 							}
 						}
 					}
+					var count = toBeChanged.count
 					
 					toBeChanged.forEach { date, cert in
 						DCCDataCenter.localDataManager.remove(withDate: date) { status in
-							guard case .success(_) = status else { completion(false, nil, nil); return }
+							guard case .success = status else { completion(false, nil, nil); return }
 							var storedTan: String!
 							certStrings.forEach { certString in
 								if certString.cert!.certHash.elementsEqual(cert.certHash) {
@@ -462,7 +463,8 @@ public extension GatewayConnection {
 								}
 							}
 							DCCDataCenter.localDataManager.add(cert, with: storedTan) { status in
-								guard case .success(_) = status else { completion(false, nil, nil); return }
+								guard case .success = status else { completion(false, nil, nil); return }
+								count -= 1
 								if count == 0 {
 									completion(true, nil, nil)
 								}
