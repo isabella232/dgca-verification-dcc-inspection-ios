@@ -400,66 +400,78 @@ public extension GatewayConnection {
         }
     }
     
-    static func lookup(certStrings: [DatedCertString], completion: @escaping ContextCompletion) {
-        guard certStrings.count != 0 else { completion(true, nil, nil); return; }
-        // construct certs from strings
-        var certs: [Date: HCert] = [:]
-        for string in certStrings {
-            guard let c = string.cert else { completion(false, nil, nil); return; }
-            // certs.append(c)
-            certs[string.date] = c
-        }
-        
-        DGCAJwt.makeJwtAndSign(fromCerts: Array(certs.values)) { success, jwts, error in
-            guard let jwts = jwts,
-                  success == true,
-                  error == nil else {
-                      completion(false, nil, GatewayError.local(description: "JWT creation failed!"))
-                      return
-                  }
-            // let param = ["value": jwts]
-            var request = URLRequest(url: URL(string: "https://dgca-revocation-service-eu-test.cfapps.eu10.hana.ondemand.com/revocation/lookup")!)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = try! JSONSerialization.data(withJSONObject: jwts)
-            AF.request(request).response {
-                guard case .success = $0.result,
-                    let status = $0.response?.statusCode,
-                    let response = try? JSONSerialization.jsonObject(with: $0.data ?? .init(), options: []) as? [String],
-                    status / 100 == 2
-                else {
-                    completion(false, nil, nil)
-                    return
-                }
-                if response.count == 0 { completion(true, nil, nil); return }
-                // response is list of hashes that have been revoked
-                let revokedHashes = response as [String]
-                for revokedHash in revokedHashes {
-                    certs.forEach { date, cert in
-                        if revokedHash.elementsEqual(cert.uvciHash![0..<cert.uvciHash!.count/2].toHexString()) ||
-                            revokedHash.elementsEqual(cert.signatureHash![0..<cert.signatureHash!.count/2].toHexString()) ||
-                            revokedHash.elementsEqual(cert.countryCodeUvciHash![0..<cert.countryCodeUvciHash!.count/2].toHexString()) {
-                            cert.isRevoked = true
-                            // remove old certificate and add new
-                            DCCDataCenter.localDataManager.remove(withDate: date) { status in
-                                guard case .success = status else { completion(false, nil, nil); return }
-                                var storedTan: String?
-                                certStrings.forEach { certString in
-                                    if certString.cert!.certHash.elementsEqual(cert.certHash) {
-                                        storedTan = certString.storedTAN ?? nil
-                                    }
-                                }
-                                DCCDataCenter.localDataManager.add(cert, with: storedTan) { status in
-                                    guard case .success = status else { completion(false, nil, nil); return }
-                                }
-                            }
-                        }
-                    }
-                }
-                completion(true, nil, nil)
-            }
-        }
-    }
+	static func lookup(certStrings: [DatedCertString], completion: @escaping ContextCompletion) {
+			 guard certStrings.count != 0 else { completion(true, nil, nil); return; }
+			// construct certs from strings
+			var certs: [Date: HCert] = [:]
+			for string in certStrings {
+				guard let c = string.cert else { completion(false, nil, nil); return; }
+				// certs.append(c)
+				certs[string.date] = c
+			}
+			
+			DGCAJwt.makeJwtAndSign(fromCerts: Array(certs.values)) { success, jwts, error in
+				guard let jwts = jwts,
+					  success == true,
+					  error == nil else {
+						  completion(false, nil, GatewayError.local(description: "JWT creation failed!"))
+						  return
+					  }
+				// let param = ["value": jwts]
+				var request = URLRequest(url: URL(string: "https://dgca-revocation-service-eu-test.cfapps.eu10.hana.ondemand.com/revocation/lookup")!)
+				request.httpMethod = "POST"
+				request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+				request.httpBody = try! JSONSerialization.data(withJSONObject: jwts)
+				AF.request(request).response {
+					guard
+						case .success(_) = $0.result,
+						let status = $0.response?.statusCode,
+						let response = try? JSONSerialization.jsonObject(with: $0.data ?? .init(), options: []) as? [String],
+						status / 100 == 2
+					else {
+						completion(false, nil, nil)
+						return
+					}
+					if response.count == 0 { completion(true, nil, nil); return }
+					// response is list of hashes that have been revoked
+					var count = certs.count
+					let revokedHashes = response as [String]
+					// identify all certs that have changed
+					var toBeChanged: [Date: HCert] = [:]
+					certs.forEach { date, cert in
+						if revokedHashes.contains(cert.uvciHash![0..<cert.uvciHash!.count/2].toHexString()) ||
+							revokedHashes.contains(cert.signatureHash![0..<cert.signatureHash!.count/2].toHexString()) ||
+							revokedHashes.contains(cert.countryCodeUvciHash![0..<cert.countryCodeUvciHash!.count/2].toHexString()) {
+							cert.isRevoked = true
+							toBeChanged[date] = cert
+						} else {
+							if cert.isRevoked {
+								cert.isRevoked = false
+								toBeChanged[date] = cert
+							}
+						}
+					}
+					
+					toBeChanged.forEach { date, cert in
+						DCCDataCenter.localDataManager.remove(withDate: date) { status in
+							guard case .success(_) = status else { completion(false, nil, nil); return }
+							var storedTan: String!
+							certStrings.forEach { certString in
+								if certString.cert!.certHash.elementsEqual(cert.certHash) {
+									storedTan = certString.storedTAN ?? ""
+								}
+							}
+							DCCDataCenter.localDataManager.add(cert, with: storedTan) { status in
+								guard case .success(_) = status else { completion(false, nil, nil); return }
+								if count == 0 {
+									completion(true, nil, nil)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 }
 
 public typealias TicketingCompletion = (AccessTokenResponse?, GatewayError?) -> Void
