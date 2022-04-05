@@ -33,7 +33,7 @@ public class DatedCertString: Codable {
     public let certString: String
     public let storedTAN: String?
     public var cert: HCert? {
-        return try? HCert(from: certString)
+        return try? HCert(payload: certString, ruleCountryCode: nil)
     }
     
     public init(date: Date, certString: String, storedTAN: String?, isRevoked: Bool?) {

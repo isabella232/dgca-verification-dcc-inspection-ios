@@ -31,23 +31,24 @@ import DGCCoreLibrary
 import SWCompression
 import CoreData
 
-public typealias ProcessingCompletion = (RevocationError?) -> Void
+typealias ProcessingCompletion = (RevocationError?) -> Void
 
-public typealias RevocationProcessingCompletion = (Set<RevocationModel>?, Set<RevocationModel>?, RevocationError?) -> Void
-public typealias PartitionProcessingCompletion = ([PartitionModel]?, RevocationError?) -> Void
-public typealias MetadataProcessingCompletion = ([SliceMetaData]?, RevocationError?) -> Void
+typealias RevocationProcessingCompletion = (Set<RevocationModel>?, Set<RevocationModel>?, RevocationError?) -> Void
+typealias PartitionProcessingCompletion = ([PartitionModel]?, RevocationError?) -> Void
+typealias MetadataProcessingCompletion = ([SliceMetaData]?, RevocationError?) -> Void
 
-public class RevocationWorker {
-    public init(service: RevocationServiceProtocol = RevocationService(baseServicePath: SharedConstants.revocationServiceBase)) {
+class RevocationWorker {
+    init(service: RevocationServiceProtocol = RevocationService(baseServicePath: SharedConstants.revocationServiceBase)) {
         self.revocationService = service
     }
     
-    public let revocationCoreDataManager: RevocationCoreDataManager = RevocationCoreDataManager()
-    public let revocationService: RevocationServiceProtocol
-    public var loadedRevocations: [RevocationModel]?
+    let revocationCoreDataManager: RevocationCoreDataManager = RevocationCoreDataManager()
+    let revocationService: RevocationServiceProtocol
+    var loadedRevocations: [RevocationModel]?
     
     // MARK: - Work with Revocations
-    public func processReloadRevocations(completion: @escaping ProcessingCompletion) {
+    func processReloadRevocations(completion: @escaping ProcessingCompletion) {
+        
         self.revocationService.getRevocationLists {[unowned self] revocations, etag, err in
             guard err == nil else { completion(.network(reason: err!.localizedDescription)); return }
             guard let revocations = revocations, !revocations.isEmpty, let etag = etag else { completion(.nodata); return }
@@ -58,12 +59,12 @@ public class RevocationWorker {
             let group = DispatchGroup()
             group.enter()
             self.processDownloadNewRevocations(loadPartList) { err in
-                guard err == nil else { group.leave(); completion(err!); return }
+                guard err == nil else { completion(err!); return }
                 group.leave()
             }
             group.enter()
             self.processUpdateExistedRevocations(updatePartList) { err in
-                guard err == nil else { group.leave(); completion(err!); return }
+                guard err == nil else { completion(err!); return }
                 group.leave()
             }
             
@@ -73,8 +74,9 @@ public class RevocationWorker {
         }
     }
     
-    private func processReviewRevocations(_ models: [RevocationModel]) -> ([RevocationModel], [RevocationModel]){
+    private func processReviewRevocations(_ models: [RevocationModel]) -> ([RevocationModel], [RevocationModel]) {
         // 8) Delete all KID entries in all tables which are not on this list.
+        
         var newlyAddedRevocations = [RevocationModel]()
         var revocationsToReload = [RevocationModel]()
         let currentRevocations = readLocalRevocations() ?? []
@@ -82,22 +84,22 @@ public class RevocationWorker {
         for revocationObject in currentRevocations {
             guard let localModel = makeRevocationModel(revocation: revocationObject) else { continue }
             let todayDate = Date()
-            
+  
             if let loadedModel = models.filter({ $0.kid == localModel.kid }).first {
                 // 9) Check if “Mode” was changed. If yes, delete all associated entries with the KID.
                 let loadedModifiedDate = Date(rfc3339DateTimeString: loadedModel.lastUpdated) ?? Date.distantPast
                 
-                if loadedModel.mode != localModel.mode {
+                if localModel.expires < todayDate {
+                    removeRevocation(kid: localModel.kid)
+                    
+                } else if loadedModel.mode != localModel.mode {
                     removeRevocation(kid: localModel.kid)
                     saveRevocation(model: loadedModel)
                     
                     newlyAddedRevocations.append(loadedModel)
-                    
+                
                 } else if localModel.lastUpdated != loadedModifiedDate {
                     revocationsToReload.append(loadedModel)
-                    
-                } else if localModel.expires < todayDate {
-                    removeRevocation(kid: localModel.kid)
                 }
             } else {
                 removeRevocation(kid: localModel.kid)
@@ -133,7 +135,7 @@ public class RevocationWorker {
             }
         }
     }
-    
+
     private func downloadNewRevocations(revocations: [RevocationModel], completion: @escaping PartitionProcessingCompletion) {
         let center = NotificationCenter.default
         let group = DispatchGroup()
@@ -142,7 +144,7 @@ public class RevocationWorker {
         for model in revocations {
             let kidForLoad = Helper.convertToBase64url(base64: model.kid)
             group.enter()
-            self.revocationService.getRevocationPartitions(for: kidForLoad) { partitions, _, err in
+            self.revocationService.getRevocationPartitions(for: kidForLoad, dateString: nil) {[unowned self] partitions, _, err in
                 guard err == nil else {
                     completion(nil, .network(reason: err!.localizedDescription))
                     return
@@ -165,7 +167,7 @@ public class RevocationWorker {
             completion(partitionsForLoad, nil)
         }
     }
-    
+
     private func processUpdateExistedRevocations(_ revocations: [RevocationModel], completion: @escaping ProcessingCompletion) {
        self.downloadExistedRevocations(revocations: revocations) { partitions, err in
             guard err == nil else {
@@ -186,16 +188,19 @@ public class RevocationWorker {
             }
         }
     }
-    
+
     private func downloadExistedRevocations(revocations: [RevocationModel], completion: @escaping PartitionProcessingCompletion) {
         let center = NotificationCenter.default
         let group = DispatchGroup()
         var partitionsForLoad = [PartitionModel]()
         var index: Float = 0.0
         for model in revocations {
+            let localRevocation = self.revocationCoreDataManager.loadRevocation(kid: model.kid)
+            let lastUpdatedStr = localRevocation?.lastUpdated?.dateOffsetString
             let kidForLoad = Helper.convertToBase64url(base64: model.kid)
             group.enter()
-            self.revocationService.getRevocationPartitions(for: kidForLoad) { partitions, _, err in
+            
+            self.revocationService.getRevocationPartitions(for: kidForLoad, dateString: lastUpdatedStr) { partitions, _, err in
                 guard err == nil else {
                     completion(nil, .network(reason: err!.localizedDescription))
                     return
@@ -215,17 +220,18 @@ public class RevocationWorker {
             completion(partitionsForLoad, nil)
         }
     }
-    
+
     // MARK: - download Chunks
     private func downloadChunkMetadata(partitions: [PartitionModel], completion: @escaping ProcessingCompletion) {
         let group = DispatchGroup()
         var index: Float = 0.0
         let center = NotificationCenter.default
-        
+
         for part in partitions {
             group.enter()
+
             let kidForLoad = Helper.convertToBase64url(base64: part.kid)
-            self.revocationService.getRevocationPartitionChunks(for:kidForLoad, id: part.id ?? "null", cids: nil) { [unowned self] zipdata, err in
+            self.revocationService.getRevocationPartitionChunks(for:kidForLoad, id: part.id ?? "null", cids: nil, dateString: nil) { [unowned self] zipdata, err in
                 guard err == nil else {
                     completion(err!)
                     return
@@ -249,6 +255,7 @@ public class RevocationWorker {
     }
     
     // MARK: - update Partitions
+    
     private func updateExistedPartitions(_ partitions: [PartitionModel], completion: @escaping ProcessingCompletion) {
         let todayDate = Date()
         var index: Float = 0.0
@@ -256,6 +263,7 @@ public class RevocationWorker {
         let group = DispatchGroup()
 
         for loadedPartition in partitions {
+            
             let loadedPartitionKID = loadedPartition.kid
             let loadedPartitionID = loadedPartition.id ?? "null"
             let loadedModifiedDate = Date(rfc3339DateTimeString: loadedPartition.lastUpdated) ?? Date.distantPast
@@ -277,6 +285,8 @@ public class RevocationWorker {
                     let localPid = localPartition.value(forKey: "id") as? String,
                     let localChunks: NSOrderedSet = localPartition.value(forKey: "chunks") as? NSOrderedSet else { continue }
                 
+                let lastUpdatedStr = localModifiedDate.dateOffsetString
+
                 if localExpiredDate < todayDate {
                     DispatchQueue.main.async {
                         self.revocationCoreDataManager.deletePartition(kid: localKid, id: localPid)
@@ -286,7 +296,7 @@ public class RevocationWorker {
                 if localModifiedDate < loadedModifiedDate {
                     group.enter()
                     let kidForLoad = Helper.convertToBase64url(base64: localKid)
-                    self.revocationService.getRevocationPartitionChunks(for: kidForLoad, id: localPid, cids: nil) { zipdata, err in
+                    self.revocationService.getRevocationPartitionChunks(for: kidForLoad, id: localPid, cids: nil, dateString: lastUpdatedStr) { [unowned self] zipdata, err in
                         guard err == nil else {
                             completion(err!)
                             return
@@ -336,7 +346,8 @@ public class RevocationWorker {
                                     let localSliceExpDate = localSlice.value(forKey: "expiredDate") as? Date {
                                     group.enter()
                                     self.processAndUpdateSlice(kid: loadedPartitionKID, id: loadedPartitionID, cid: loadedChunkID,
-                                        localExpDate: localSliceExpDate, loadedExpDate: loadedSliceDate, sliceModel: loadedSliceModel) { err in
+                                        localExpDate: localSliceExpDate, loadedExpDate: loadedSliceDate,
+                                            sliceModel: loadedSliceModel, dateString: lastUpdatedStr) { err in
                                         guard err == nil else {
                                             completion(err!)
                                             return
@@ -378,7 +389,7 @@ public class RevocationWorker {
         }
     }
     
-    private func processAndUpdateSlice(kid: String, id: String, cid: String, localExpDate: Date, loadedExpDate: Date, sliceModel: SliceModel, completion: @escaping ProcessingCompletion) {
+    private func processAndUpdateSlice(kid: String, id: String, cid: String, localExpDate: Date, loadedExpDate: Date, sliceModel: SliceModel, dateString: String?,  completion: @escaping ProcessingCompletion) {
         guard sliceModel.version == "1.0" else {
             completion(nil)
             return
@@ -392,7 +403,7 @@ public class RevocationWorker {
         
         if localExpDate != loadedExpDate {
             let kidForLoad = Helper.convertToBase64url(base64: kid)
-            self.revocationService.getRevocationPartitionChunkSliceSingle(for: kidForLoad, id: id, cid: cid, sid: sliceModel.hash) { data, err in
+            self.revocationService.getRevocationPartitionChunkSliceSingle(for: kidForLoad, id: id, cid: cid, sid: sliceModel.hash, dateString: dateString) { [unowned self] data, err in
                 guard err == nil else {
                     completion(err!)
                     return
@@ -419,7 +430,7 @@ public class RevocationWorker {
         }
         
         let kidForLoad = Helper.convertToBase64url(base64: kid)
-        self.revocationService.getRevocationPartitionChunkSliceSingle(for: kidForLoad, id: id, cid: cid, sid: sliceModel.hash) { data, err in
+        self.revocationService.getRevocationPartitionChunkSliceSingle(for: kidForLoad, id: id, cid: cid, sid: sliceModel.hash, dateString: nil) { [unowned self] data, err in
             guard err == nil else {
                 completion(err!)
                 return
@@ -441,7 +452,7 @@ public class RevocationWorker {
             }
         }
         let kidForLoad = Helper.convertToBase64url(base64: kid)
-        self.revocationService.getRevocationPartitionChunk(for: kidForLoad, id: id, cid: cid, completion: { data, err in
+        self.revocationService.getRevocationPartitionChunk(for: kidForLoad, id: id, cid: cid, dateString: nil, completion: { [unowned self] data, err in
             guard err == nil else {
                 completion(err!)
                 return
@@ -454,6 +465,7 @@ public class RevocationWorker {
     }
     
     // MARK: - process Zip
+
     private func processReadZipData(kid: String, zipData: Data) {
         do {
             let tarData = try GzipArchive.unarchive(archive: zipData)
@@ -481,6 +493,7 @@ public class RevocationWorker {
     }
     
     // MARK: - Auxilary methods
+
     private func removeRevocation(kid: String) {
         DispatchQueue.main.async {
             self.revocationCoreDataManager.removeRevocation(kid: kid)
