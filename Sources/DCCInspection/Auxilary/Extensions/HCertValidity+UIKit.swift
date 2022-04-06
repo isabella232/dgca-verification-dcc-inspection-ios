@@ -35,6 +35,7 @@ import DGCCoreLibrary
 
 public extension VerificationResult {
   
+    
     var validityResult: String {
         switch self {
         case .valid:
@@ -47,7 +48,11 @@ public extension VerificationResult {
 //            return "Revoked".localized
         }
     }
-        
+    
+    var revocationResult: String {
+        return "Revoked".localized
+    }
+
     var validityButtonTitle: String {
         switch self {
         case .valid:
@@ -59,7 +64,12 @@ public extension VerificationResult {
         }
     }
 
+    var revocationButtonTitle: String {
+        return "Retry".localized
+    }
+    
 #if os(iOS)
+
     var validityImage: UIImage {
         switch self {
         case .valid:
@@ -69,6 +79,9 @@ public extension VerificationResult {
         case .partlyValid:
             return UIImage(named: "check", in: .module, compatibleWith: nil)!
         }
+    }
+    var revocationIcon: UIImage {
+        return UIImage(named: "error", in: .module, compatibleWith: nil)!
     }
 
     var validityBackground: UIColor {
@@ -81,6 +94,11 @@ public extension VerificationResult {
             return UIColor.certificateLimited
         }
     }
+    
+    var revocationBackground: UIColor {
+        return UIColor.certificateRed
+    }
+
 #else
     var validityImage: NSImage {
         switch self {
