@@ -29,7 +29,7 @@
 import Foundation
 import DGCCoreLibrary
 
-public struct ValidityState: CertificateVerifying {
+public struct ValidityState: VerifyingProtocol {
     
     public let technicalValidity: VerificationResult
     public let issuerValidity: VerificationResult
