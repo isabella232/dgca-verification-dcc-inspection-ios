@@ -83,9 +83,17 @@ extension DCCInspection: CertificateInspection {
         }
     }
     
+    
     public func validateCertificate(_ certificate: CertificationProtocol) -> VerifyingProtocol {
         let validator = DCCCertificateValidator(with: certificate as! HCert)
         let validityState = validator.validateDCCCertificate()
         return validityState
     }
+    
+    public func validateCertificate(_ cert: HCert) -> ValidityState {
+        let validator = DCCCertificateValidator(with: cert)
+        let validityState = validator.validateDCCCertificate()
+        return validityState
+    }
+
 }
