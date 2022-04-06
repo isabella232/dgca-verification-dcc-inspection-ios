@@ -45,8 +45,7 @@ public final class DCCInspection {
     static var config = HCertConfig.default
     
     
-    public init() {
-    }
+    public init() { }
     
     public func verifyCert() { }
     
@@ -56,8 +55,8 @@ public final class DCCInspection {
         return validityState
     }
     
-    public func makeCertificateViewerBuilder(_ hCert: HCert, validityState: ValidityState, for appType: AppType) -> SectionBuilder {
-        let builder = SectionBuilder(with: hCert, validity: validityState, for: appType)
+    public func makeCertificateViewerBuilder(_ hCert: HCert, validityState: ValidityState, for appType: AppType) -> DCCSectionBuilder {
+        let builder = DCCSectionBuilder(with: hCert, validity: validityState, for: appType)
         return builder
     }
 }
