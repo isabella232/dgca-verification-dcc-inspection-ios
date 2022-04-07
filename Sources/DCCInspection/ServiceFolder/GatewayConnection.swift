@@ -442,8 +442,10 @@ public extension GatewayConnection {
 						if revokedHashes.contains(cert.uvciHash!.dropLast(16).toHexString()) ||
 							revokedHashes.contains(cert.signatureHash!.dropLast(16).toHexString()) ||
 							revokedHashes.contains(cert.countryCodeUvciHash!.dropLast(16).toHexString()) {
-							cert.isRevoked = true
-							toBeChanged[date] = cert
+							if !cert.isRevoked {
+								cert.isRevoked = true
+								toBeChanged[date] = cert
+							}
 						} else {
 							if cert.isRevoked {
 								cert.isRevoked = false
@@ -452,7 +454,7 @@ public extension GatewayConnection {
 						}
 					}
 					var count = toBeChanged.count
-					
+					if count == 0 { completion(true, nil, nil); return; }
 					toBeChanged.forEach { date, cert in
 						DCCDataCenter.localDataManager.remove(withDate: date) { status in
 							guard case .success = status else { completion(false, nil, nil); return }
