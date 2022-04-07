@@ -26,6 +26,7 @@
 //  
 
 import Foundation
+import DGCCoreLibrary
 
 public protocol PublicKeyEncoding: AnyObject {
     func getEncodedPublicKeys(for _: String) -> [String]

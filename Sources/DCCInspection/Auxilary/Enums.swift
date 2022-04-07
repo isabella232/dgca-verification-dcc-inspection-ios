@@ -31,46 +31,11 @@ public enum ClaimKey: String {
   case euDgcV1 = "1"
 }
 
-public enum AttributeKey: String {
-  case firstName
-  case lastName
-  case firstNameStandardized
-  case lastNameStandardized
-  case gender
-  case dateOfBirth
-  case testStatements
-  case vaccineStatements
-  case recoveryStatements
-}
-
 public enum HCertType: String {
   case test
   case vaccine
   case recovery
   case unknown
-}
-
-public enum HCertValidity {
-    case valid
-    case invalid
-    case ruleInvalid
-    case revoked
-}
-
-public let attributeKeys: [AttributeKey: [String]] = [
-  .firstName: ["nam", "gn"],
-  .lastName: ["nam", "fn"],
-  .firstNameStandardized: ["nam", "gnt"],
-  .lastNameStandardized: ["nam", "fnt"],
-  .dateOfBirth: ["dob"],
-  .testStatements: ["t"],
-  .vaccineStatements: ["v"],
-  .recoveryStatements: ["r"]
-]
-
-public enum InfoSectionStyle {
-  case normal
-  case fixedWidthFont
 }
 
 public class ParseErrors {

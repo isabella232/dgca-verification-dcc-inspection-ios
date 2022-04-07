@@ -45,8 +45,7 @@ public final class DCCInspection {
     static var config = HCertConfig.default
     
     
-    public init() {
-    }
+    public init() { }
     
     public func verifyCert() { }
     
@@ -56,13 +55,14 @@ public final class DCCInspection {
         return validityState
     }
     
-    public func makeCertificateViewerBuilder(_ hCert: HCert, validityState: ValidityState, for appType: AppType) -> SectionBuilder {
-        let builder = SectionBuilder(with: hCert, validity: validityState, for: appType)
+    public func makeCertificateViewerBuilder(_ hCert: HCert, validityState: ValidityState, for appType: AppType) -> DCCSectionBuilder {
+        let builder = DCCSectionBuilder(with: hCert, validity: validityState, for: appType)
         return builder
     }
 }
 
 extension DCCInspection: CertificateInspection {
+    
     public func prepareLocallyStoredData(appType: AppType, completion: @escaping DataCompletionHandler) {
         switch appType {
         case .verifier:
@@ -82,4 +82,18 @@ extension DCCInspection: CertificateInspection {
             DCCDataCenter.reloadWalletStorageData(completion: completion)
         }
     }
+    
+    
+    public func validateCertificate(_ certificate: CertificationProtocol) -> VerifyingProtocol {
+        let validator = DCCCertificateValidator(with: certificate as! HCert)
+        let validityState = validator.validateDCCCertificate()
+        return validityState
+    }
+    
+    public func validateCertificate(_ cert: HCert) -> ValidityState {
+        let validator = DCCCertificateValidator(with: cert)
+        let validityState = validator.validateDCCCertificate()
+        return validityState
+    }
+
 }

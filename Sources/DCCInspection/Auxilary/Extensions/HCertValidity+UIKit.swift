@@ -33,46 +33,55 @@ import AppKit
 #endif
 import DGCCoreLibrary
 
-public extension HCertValidity {
+public extension VerificationResult {
   
+    
     var validityResult: String {
         switch self {
         case .valid:
             return "Valid".localized
         case .invalid:
             return "Invalid".localized
-        case .ruleInvalid:
+        case .partlyValid:
             return "Limited validity".localized
-        case .revoked:
-            return "Revoked".localized
+//        case .revoked:
+//            return "Revoked".localized
         }
     }
-        
+    
+    var revocationResult: String {
+        return "Revoked".localized
+    }
+
     var validityButtonTitle: String {
         switch self {
         case .valid:
             return "Done".localized
         case .invalid:
             return "Retry".localized
-        case .ruleInvalid:
-            return "Retry".localized
-        case .revoked:
+        case .partlyValid:
             return "Retry".localized
         }
     }
 
+    var revocationButtonTitle: String {
+        return "Retry".localized
+    }
+    
 #if os(iOS)
+
     var validityImage: UIImage {
         switch self {
         case .valid:
             return UIImage(named: "check", in: .module, compatibleWith: nil)!
         case .invalid:
             return UIImage(named: "error", in: .module, compatibleWith: nil)!
-        case .ruleInvalid:
+        case .partlyValid:
             return UIImage(named: "check", in: .module, compatibleWith: nil)!
-        case .revoked:
-            return UIImage(named: "error", in: .module, compatibleWith: nil)!
         }
+    }
+    var revocationIcon: UIImage {
+        return UIImage(named: "error", in: .module, compatibleWith: nil)!
     }
 
     var validityBackground: UIColor {
@@ -81,12 +90,15 @@ public extension HCertValidity {
             return UIColor.certificateGreen
         case .invalid:
             return UIColor.certificateRed
-        case .ruleInvalid:
+        case .partlyValid:
             return UIColor.certificateLimited
-        case .revoked:
-            return UIColor.certificateRed
         }
     }
+    
+    var revocationBackground: UIColor {
+        return UIColor.certificateRed
+    }
+
 #else
     var validityImage: NSImage {
         switch self {
@@ -94,10 +106,8 @@ public extension HCertValidity {
             return NSImage(named: "check")!
         case .invalid:
             return NSImage(named: "error")!
-        case .ruleInvalid:
+        case .partlyValid:
             return NSImage(named: "check")!
-        case .revoked:
-            return NSImage(named: "error")!
         }
     }
     var validityBackground: NSColor {
@@ -106,10 +116,8 @@ public extension HCertValidity {
             return .green
         case .invalid:
             return .red
-        case .ruleInvalid:
+        case .partlyValid:
             return .yellow
-        case .revoked:
-            return .red
         }
     }
 #endif

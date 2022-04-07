@@ -24,45 +24,44 @@
 //  
 //  Created by Igor Khomiak on 18.10.2021.
 //  
-        
+
 
 import Foundation
+import DGCCoreLibrary
 
-public struct ValidityState {
-
-    public let technicalValidity: HCertValidity
-    public let issuerValidity: HCertValidity
-    public let destinationValidity: HCertValidity
-    public let travalerValidity: HCertValidity
-    public let allRulesValidity: HCertValidity
-    public let revocationValidity: HCertValidity
+public struct ValidityState: VerifyingProtocol {
+    
+    public let technicalValidity: VerificationResult
+    public let issuerValidity: VerificationResult
+    public let destinationValidity: VerificationResult
+    public let travalerValidity: VerificationResult
+    public let allRulesValidity: VerificationResult
     public let validityFailures: [String]
-    public let infoRulesSection: InfoSection?
-
-    public var isNotPassed: Bool {
-        return technicalValidity != .valid ||
-            issuerValidity != .valid ||
-            destinationValidity != .valid ||
-            revocationValidity != .valid ||
-            travalerValidity != .valid
+    public var infoSection: InfoSection?
+    public let isRevoked: Bool
+    
+    public var isVerificationFailed: Bool {
+        return technicalValidity != .valid || issuerValidity != .valid ||
+        destinationValidity != .valid || travalerValidity != .valid || isRevoked
     }
-     
+    
     public init(
-        technicalValidity: HCertValidity,
-        issuerValidity: HCertValidity,
-        destinationValidity: HCertValidity,
-        travalerValidity: HCertValidity,
-        allRulesValidity: HCertValidity,
-        revocationValidity: HCertValidity,
+        technicalValidity: VerificationResult,
+        issuerValidity: VerificationResult,
+        destinationValidity: VerificationResult,
+        travalerValidity: VerificationResult,
+        allRulesValidity: VerificationResult,
         validityFailures: [String],
-        infoRulesSection: InfoSection?) {
-            self.technicalValidity = technicalValidity
-            self.issuerValidity = issuerValidity
-            self.destinationValidity = destinationValidity
-            self.travalerValidity = travalerValidity
-            self.revocationValidity = revocationValidity
-            self.allRulesValidity = allRulesValidity
-            self.validityFailures = validityFailures
-            self.infoRulesSection = infoRulesSection
+        infoSection: InfoSection?,
+        isRevoked: Bool
+    ) {
+        self.technicalValidity = technicalValidity
+        self.issuerValidity = issuerValidity
+        self.destinationValidity = destinationValidity
+        self.travalerValidity = travalerValidity
+        self.allRulesValidity = allRulesValidity
+        self.validityFailures = validityFailures
+        self.infoSection = infoSection
+        self.isRevoked = isRevoked
     }
-}
+ }
