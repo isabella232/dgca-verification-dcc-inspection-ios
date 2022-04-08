@@ -44,6 +44,7 @@ public extension VerificationResult {
             return "Invalid".localized
         case .partlyValid:
             return "Limited validity".localized
+        }
     }
         
     var validityButtonTitle: String {
