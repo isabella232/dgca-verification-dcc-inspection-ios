@@ -33,9 +33,9 @@ import AppKit
 #endif
 import DGCCoreLibrary
 
+
 public extension VerificationResult {
   
-    
     var validityResult: String {
         switch self {
         case .valid:
@@ -44,15 +44,8 @@ public extension VerificationResult {
             return "Invalid".localized
         case .partlyValid:
             return "Limited validity".localized
-//        case .revoked:
-//            return "Revoked".localized
-        }
     }
-    
-    var revocationResult: String {
-        return "Revoked".localized
-    }
-
+        
     var validityButtonTitle: String {
         switch self {
         case .valid:
@@ -63,11 +56,7 @@ public extension VerificationResult {
             return "Retry".localized
         }
     }
-
-    var revocationButtonTitle: String {
-        return "Retry".localized
-    }
-    
+        
 #if os(iOS)
 
     var validityImage: UIImage {
@@ -80,6 +69,7 @@ public extension VerificationResult {
             return UIImage(named: "check", in: .module, compatibleWith: nil)!
         }
     }
+        
     var revocationIcon: UIImage {
         return UIImage(named: "error", in: .module, compatibleWith: nil)!
     }
