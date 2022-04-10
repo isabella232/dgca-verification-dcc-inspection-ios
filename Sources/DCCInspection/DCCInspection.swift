@@ -44,6 +44,9 @@ public final class DCCInspection {
     static var publicKeyEncoder: PublicKeyStorageDelegate?
     static var config = HCertConfig.default
     
+    public var lastUpdate: Date {
+        DCCDataCenter.lastFetch
+    }
     
     public init() { }
     
