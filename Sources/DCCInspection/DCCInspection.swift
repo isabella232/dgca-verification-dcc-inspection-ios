@@ -33,7 +33,7 @@ import AppKit
 
 import DGCCoreLibrary
 
-public final class DCCInspection {
+public final class DCCInspection: CertificateInspection {
     
     #if os(iOS)
     static var cachedQrCodes = SyncDict<UIImage>()
@@ -44,27 +44,12 @@ public final class DCCInspection {
     static var publicKeyEncoder: PublicKeyStorageDelegate?
     static var config = HCertConfig.default
     
+    
+    public init() { }
+            
     public var lastUpdate: Date {
         DCCDataCenter.lastFetch
     }
-    
-    public init() { }
-    
-    public func verifyCert() { }
-    
-    public func checkValidityCertificate(_ hCert: HCert) -> ValidityState {
-        let validator = DCCCertificateValidator(with: hCert)
-        let validityState = validator.validateDCCCertificate()
-        return validityState
-    }
-    
-    public func makeCertificateViewerBuilder(_ hCert: HCert, validityState: ValidityState, for appType: AppType) -> DCCSectionBuilder {
-        let builder = DCCSectionBuilder(with: hCert, validity: validityState, for: appType)
-        return builder
-    }
-}
-
-extension DCCInspection: CertificateInspection {
     
     public func prepareLocallyStoredData(appType: AppType, completion: @escaping DataCompletionHandler) {
         switch appType {
@@ -86,17 +71,28 @@ extension DCCInspection: CertificateInspection {
         }
     }
     
-    
     public func validateCertificate(_ certificate: CertificationProtocol) -> VerifyingProtocol {
         let validator = DCCCertificateValidator(with: certificate as! HCert)
         let validityState = validator.validateDCCCertificate()
         return validityState
     }
+}
+
+extension DCCInspection {
+    public func checkValidityCertificate(_ hCert: HCert) -> ValidityState {
+        let validator = DCCCertificateValidator(with: hCert)
+        let validityState = validator.validateDCCCertificate()
+        return validityState
+    }
     
+    public func makeCertificateViewerBuilder(_ hCert: HCert, validityState: ValidityState, for appType: AppType) -> DCCSectionBuilder {
+        let builder = DCCSectionBuilder(with: hCert, validity: validityState, for: appType)
+        return builder
+    }
+
     public func validateCertificate(_ cert: HCert) -> ValidityState {
         let validator = DCCCertificateValidator(with: cert)
         let validityState = validator.validateDCCCertificate()
         return validityState
     }
-
 }
