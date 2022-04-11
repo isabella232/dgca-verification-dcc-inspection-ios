@@ -25,9 +25,9 @@
 
 */
 
-"enum.HCertType.test" = "Test Result";
-"enum.HCertType.vaccine" = "Vaccination";
-"enum.HCertType.recovery" = "Recovery";
+"HCertType.test" = "Test Result";
+"HCertType.vaccine" = "Vaccination";
+"HCertType.recovery" = "Recovery";
 "Valid" = "Valid";
 "Invalid" = "Invalid";
 "Limited validity" = "Limited validity";
