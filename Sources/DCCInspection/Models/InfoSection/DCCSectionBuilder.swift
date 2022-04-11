@@ -53,28 +53,28 @@ public class DCCSectionBuilder {
     private func makeRevocationSections() {
         infoSection.removeAll()
         
-        let hSection = InfoSection(header: "Certificate Type".localized, content: certificate.certTypeString)
+        let hSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString)
         infoSection += [hSection]
         
-        let rSection = InfoSection(header: "Reason for Invalidity".localized, content: "Certificate has been revoked".localized)
+        let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
         infoSection += [rSection]
         
-        let famSection = InfoSection( header: "Standardised Family Name".localized,
+        let famSection = InfoSection( header: localize("Standardised Family Name"),
           content: certificate.lastNameStandardized.replacingOccurrences( of: "<",
             with: String.zeroWidthSpace + "<" + String.zeroWidthSpace), style: .fixedWidthFont)
         infoSection += [famSection]
         
-        infoSection += [InfoSection( header: "Standardised Given Name".localized,
+        infoSection += [InfoSection( header: localize("Standardised Given Name"),
             content: certificate.firstNameStandardized.replacingOccurrences( of: "<",
             with: String.zeroWidthSpace + "<" + String.zeroWidthSpace), style: .fixedWidthFont)]
-        let sSection = InfoSection( header: "Date of birth".localized, content: certificate.dateOfBirth)
+        let sSection = InfoSection( header: localize("Date of birth"), content: certificate.dateOfBirth)
         infoSection += [sSection]
         infoSection += certificate.statement == nil ? [] : certificate.statement.info
-        let uSection = InfoSection(header: "Unique Certificate Identifier".localized,
+        let uSection = InfoSection(header: localize("Unique Certificate Identifier"),
             content: certificate.uvci,style: .fixedWidthFont,isPrivate: true)
         infoSection += [uSection]
         if !certificate.issCode.isEmpty {
-            let cSection = InfoSection(header: "Issuer Country".localized, content: l10n("country.\(certificate.issCode.uppercased())"))
+            let cSection = InfoSection(header: localize("Issuer Country"), content: localize("country.\(certificate.issCode.uppercased())"))
             infoSection += [cSection]
         }
     }
@@ -100,17 +100,17 @@ public class DCCSectionBuilder {
     }
     
     private func makeSectionForRuleError(ruleSection: InfoSection, for appType: AppType) {
-        let hSection = InfoSection(header: "Certificate Type".localized, content: certificate.certTypeString )
+        let hSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString )
         infoSection += [hSection]
 
         guard !validityState.isRevoked else {
-            let rSection = InfoSection(header: "Reason for Invalidity".localized, content: "Certificate has been revoked".localized)
+            let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
             infoSection += [rSection]
             return
         }
 
         guard validityState.validityFailures.isEmpty else {
-            let vSection = InfoSection(header: "Reason for Invalidity".localized,
+            let vSection = InfoSection(header: localize("Reason for Invalidity"),
               content: validityState.validityFailures.joined(separator: " "))
             infoSection += [vSection]
             return
@@ -136,51 +136,51 @@ public class DCCSectionBuilder {
 
      private func makeSectionsForVerifier(includeInvalidSection: Bool = true) {
         if includeInvalidSection {
-            let hSection = InfoSection( header: "Certificate Type".localized, content: certificate.certTypeString )
+            let hSection = InfoSection( header: localize("Certificate Type"), content: certificate.certTypeString )
             infoSection += [hSection]
             if validityState.isRevoked {
-                let rSection = InfoSection(header: "Reason for Invalidity".localized, content: "Certificate has been revoked".localized)
+                let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
                 infoSection += [rSection]
                 return
             }
 
             if !validityState.validityFailures.isEmpty {
-                let vSection = InfoSection(header: "Reason for Invalidity".localized,
+                let vSection = InfoSection(header: localize("Reason for Invalidity"),
                     content: validityState.validityFailures.joined(separator: " "))
                 infoSection += [vSection]
                 return
             }
         }
-        let hSection = InfoSection( header: "Standardised Family Name".localized,
+        let hSection = InfoSection( header: localize("Standardised Family Name"),
           content: certificate.lastNameStandardized.replacingOccurrences( of: "<",
             with: String.zeroWidthSpace + "<" + String.zeroWidthSpace), style: .fixedWidthFont)
         infoSection += [hSection]
       
-        infoSection += [InfoSection( header: "Standardised Given Name".localized,
+        infoSection += [InfoSection( header: localize("Standardised Given Name"),
             content: certificate.firstNameStandardized.replacingOccurrences( of: "<",
             with: String.zeroWidthSpace + "<" + String.zeroWidthSpace), style: .fixedWidthFont)]
-        let sSection = InfoSection( header: "Date of birth".localized, content: certificate.dateOfBirth)
+        let sSection = InfoSection( header: localize("Date of birth"), content: certificate.dateOfBirth)
         infoSection += [sSection]
         infoSection += certificate.statement == nil ? [] : certificate.statement.info
-        let uSection = InfoSection(header: "Unique Certificate Identifier".localized,
+        let uSection = InfoSection(header: localize("Unique Certificate Identifier"),
             content: certificate.uvci,style: .fixedWidthFont,isPrivate: true)
         infoSection += [uSection]
         if !certificate.issCode.isEmpty {
-            let cSection = InfoSection(header: "Issuer Country".localized, content: l10n("country.\(certificate.issCode.uppercased())"))
+            let cSection = InfoSection(header: localize("Issuer Country"), content: localize("country.\(certificate.issCode.uppercased())"))
             infoSection += [cSection]
         }
     }
     
     private func makeSectionsForVaccine(includeInvalidSection: Bool = true) {
         if includeInvalidSection {
-            let cSection = InfoSection( header: "Certificate Type".localized, content: certificate.certTypeString)
+            let cSection = InfoSection( header: localize("Certificate Type"), content: certificate.certTypeString)
             infoSection += [cSection]
             
             if validityState.isRevoked {
-                let rSection = InfoSection(header: "Reason for Invalidity".localized, content: "Certificate has been revoked".localized)
+                let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
                 infoSection += [rSection]
             } else if !validityState.validityFailures.isEmpty {
-                let hSection = InfoSection(header: "Reason for Invalidity".localized,
+                let hSection = InfoSection(header: localize("Reason for Invalidity"),
                     content: validityState.validityFailures.joined(separator: " "))
                 infoSection += [hSection]
             }
@@ -188,36 +188,36 @@ public class DCCSectionBuilder {
         
         let fullName = certificate.fullName
         if !fullName.isEmpty {
-            let sSection = InfoSection( header: "Name".localized, content: fullName, style: .fixedWidthFont )
+            let sSection = InfoSection( header: localize("Name"), content: fullName, style: .fixedWidthFont )
             infoSection += [sSection]
         }
         infoSection += certificate.statement == nil ? [] : certificate.statement.walletInfo
         if certificate.issCode.count > 0 {
-            let cSection = InfoSection( header: "Issuer Country".localized, content: l10n("country.\(certificate.issCode.uppercased())"))
+            let cSection = InfoSection( header: localize("Issuer Country"), content: localize("country.\(certificate.issCode.uppercased())"))
             infoSection += [cSection]
         }
     }
     
     private func makeSectionsForTest(includeInvalidSection: Bool = true) {
         if includeInvalidSection {
-            let cSection = InfoSection(header: "Certificate Type".localized, content: certificate.certTypeString)
+            let cSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString)
             infoSection += [cSection]
             if validityState.isRevoked  {
-                let rSection = InfoSection(header: "Reason for Invalidity".localized, content: "Certificate has been revoked".localized)
+                let rSection = InfoSection(header: localize("Reason for Invalidity"), content:localize( "Certificate has been revoked"))
                 infoSection += [rSection]
             } else if !validityState.validityFailures.isEmpty {
-                let hSection = InfoSection(header: "Reason for Invalidity".localized,
+                let hSection = InfoSection(header: localize("Reason for Invalidity"),
                   content: validityState.validityFailures.joined(separator: " "))
                 infoSection += [hSection]
             }
         }
         let fullName = certificate.fullName
         if !fullName.isEmpty {
-            let section = InfoSection(header: "Name".localized, content: fullName, style: .fixedWidthFont)
+            let section = InfoSection(header: localize("Name"), content: fullName, style: .fixedWidthFont)
             infoSection += [section]
         }
         infoSection += certificate.statement == nil ? [] : certificate.statement.walletInfo
-          let section = InfoSection( header: "Issuer Country".localized, content: l10n("country.\(certificate.issCode.uppercased())"))
+          let section = InfoSection( header: localize("Issuer Country"), content: localize("country.\(certificate.issCode.uppercased())"))
         if !certificate.issCode.isEmpty {
             infoSection += [section]
         }
@@ -225,25 +225,25 @@ public class DCCSectionBuilder {
 
     private func makeSectionsForRecovery(includeInvalidSection: Bool = true) {
         if includeInvalidSection {
-            let hSection = InfoSection(header: "Certificate Type".localized, content: certificate.certTypeString)
+            let hSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString)
             infoSection += [hSection]
             if validityState.isRevoked  {
-                let rSection = InfoSection(header: "Reason for Invalidity".localized, content: "Certificate has been revoked".localized)
+                let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
                 infoSection += [rSection]
             } else if !validityState.validityFailures.isEmpty {
-              let vSection = InfoSection(header: "Reason for Invalidity".localized,
+              let vSection = InfoSection(header: localize("Reason for Invalidity"),
                   content: validityState.validityFailures.joined(separator: " "))
                 infoSection += [vSection]
             }
         }
         let fullName = certificate.fullName
         if !fullName.isEmpty {
-            let nSection = InfoSection( header: "Name".localized, content: fullName, style: .fixedWidthFont)
+            let nSection = InfoSection( header: localize("Name"), content: fullName, style: .fixedWidthFont)
             infoSection += [nSection]
         }
         infoSection += certificate.statement == nil ? [] : certificate.statement.walletInfo
         if !certificate.issCode.isEmpty {
-            let iSection = InfoSection(header: "Issuer Country".localized, content: l10n("country.\(certificate.issCode.uppercased())"))
+            let iSection = InfoSection(header: localize("Issuer Country"), content: localize("country.\(certificate.issCode.uppercased())"))
             infoSection += [iSection]
         }
     }

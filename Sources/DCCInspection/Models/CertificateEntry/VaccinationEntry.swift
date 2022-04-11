@@ -30,8 +30,8 @@ import DGCCoreLibrary
 
 public struct VaccinationEntry: HCertEntry {
     public var typeAddon: String {
-        let format = "%d of %d".localized
-        return .localizedStringWithFormat(format, doseNumber, dosesTotal)
+        let format = localize("%d of %d")
+        return String(format: format, doseNumber, dosesTotal)
     }
     public let uvci: String
     
@@ -46,37 +46,37 @@ public struct VaccinationEntry: HCertEntry {
     private let date: Date
 
     public var info: [InfoSection] {
-        return [InfoSection(header: "Date of Vaccination".localized, content: date.localDateString),
-            InfoSection( header: "Targeted Disease".localized,
-                content: l10n("disease." + diseaseTargeted, or: "\("Unknown".localized): \(diseaseTargeted)")),
-            InfoSection(header: "Authorization Holder / Manufacturer".localized,
-                content: l10n("vac.man." + manufacturer, or: "\("Unknown".localized): \(manufacturer)"), isPrivate: true),
-            InfoSection(header: "Medical Product".localized,
-                content: l10n("vac.product." + medicalProduct, or: "\("Unknown".localized): \(medicalProduct)"), isPrivate: true),
-            InfoSection(header: "Vaccine or Prophylaxis".localized,
-                content: l10n("vac.type." + vaccineOrProphylaxis, or: "\("Unknown".localized): \(vaccineOrProphylaxis)"), isPrivate: true),
-            InfoSection( header: "Country of Vaccination".localized, content: country(for: countryCode), isPrivate: true),
-            InfoSection( header: "Certificate Issuer".localized, content: issuer, isPrivate: true)
+        return [InfoSection(header: localize("Date of Vaccination"), content: date.localDateString),
+            InfoSection( header: localize("Targeted Disease"),
+                content: localize("disease." + diseaseTargeted, or: "\(localize("Unknown")): \(diseaseTargeted)")),
+            InfoSection(header: localize("Authorization Holder / Manufacturer"),
+                content: localize("vac.man." + manufacturer, or: "\(localize("Unknown")): \(manufacturer)"), isPrivate: true),
+            InfoSection(header: localize("Medical Product"),
+                content: localize("vac.product." + medicalProduct, or: "\(localize("Unknown")): \(medicalProduct)"), isPrivate: true),
+            InfoSection(header: localize("Vaccine or Prophylaxis"),
+                content: localize("vac.type." + vaccineOrProphylaxis, or: "\(localize("Unknown")): \(vaccineOrProphylaxis)"), isPrivate: true),
+            InfoSection( header: localize("Country of Vaccination"), content: country(for: countryCode), isPrivate: true),
+            InfoSection( header: localize("Certificate Issuer"), content: issuer, isPrivate: true)
         ]
     }
 
     public var walletInfo: [InfoSection] {
-        return [InfoSection( header: "Date of Vaccination".localized, content: date.localDateString),
-            InfoSection( header: "Targeted Disease".localized,
-                content: l10n("disease." + diseaseTargeted, or: "\("Unknown".localized): \(diseaseTargeted)")),
-            InfoSection( header: "Authorization Holder / Manufacturer".localized,
-                content: l10n("vac.man." + manufacturer, or: "\("Unknown".localized): \(manufacturer)"), isPrivate: true),
-            InfoSection(header: "Vaccine or Prophylaxis".localized,
-                content: l10n("vac.type." + vaccineOrProphylaxis, or: "\("Unknown".localized): \(vaccineOrProphylaxis)"), isPrivate: true),
-            InfoSection( header: "Country of Vaccination".localized, content: country(for: countryCode), isPrivate: true),
-            InfoSection(header: "Certificate Issuer".localized, content: issuer, isPrivate: true)
+        return [InfoSection( header: localize("Date of Vaccination"), content: date.localDateString),
+            InfoSection( header: localize("Targeted Disease"),
+                content: localize("disease." + diseaseTargeted, or: "\(localize("Unknown")): \(diseaseTargeted)")),
+            InfoSection( header: localize("Authorization Holder / Manufacturer"),
+                content: localize("vac.man." + manufacturer, or: "\(localize("Unknown")): \(manufacturer)"), isPrivate: true),
+            InfoSection(header: localize("Vaccine or Prophylaxis"),
+                content: localize("vac.type." + vaccineOrProphylaxis, or: "\(localize("Unknown")): \(vaccineOrProphylaxis)"), isPrivate: true),
+            InfoSection( header: localize("Country of Vaccination"), content: country(for: countryCode), isPrivate: true),
+            InfoSection(header: localize("Certificate Issuer"), content: issuer, isPrivate: true)
         ]
     }
 
     public var validityFailures: [String] {
       var fail = [String]()
       if date > HCert.clock {
-          fail.append("Vaccination date is in the future.".localized)
+          fail.append(localize("Vaccination date is in the future."))
       }
       return fail
     }

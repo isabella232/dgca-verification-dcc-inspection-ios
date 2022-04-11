@@ -153,7 +153,7 @@ class RevocationWorker {
                 index += 1.0
                 let progress: Float = index/Float(revocations.count)
                 center.post(name: Notification.Name("LoadingRevocationsNotificationName"), object: nil,
-                    userInfo: ["name" : "Downloading the certificate revocations database".localized, "progress" : progress] )
+                    userInfo: ["name" : localize("Downloading the certificate revocations database"), "progress" : progress] )
                 if err == nil, let partitions = partitions, !partitions.isEmpty {
                     DispatchQueue.main.async {
                         self.revocationCoreDataManager.savePartitions(kid: model.kid, models: partitions)
@@ -209,7 +209,7 @@ class RevocationWorker {
                 index += 1.0
                 let progress: Float = index/Float(revocations.count)
                 center.post(name: Notification.Name("LoadingRevocationsNotificationName"), object: nil,
-                    userInfo: ["name" : "Updating the certificate revocations database".localized, "progress" : progress] )
+                    userInfo: ["name" : localize("Updating the certificate revocations database"), "progress" : progress] )
                 if err == nil, let partitions = partitions, !partitions.isEmpty {
                     partitionsForLoad.append(contentsOf: partitions)
                 }
@@ -239,8 +239,8 @@ class RevocationWorker {
                 
                 index += 1.0
                 let progress: Float = index/Float(partitions.count)
-                center.post(name: Notification.Name("LoadingRevocationsNotificationName".localized), object: nil,
-                    userInfo: ["name" : "Downloading the certificate revocations metadata".localized, "progress" : progress])
+                center.post(name: Notification.Name("LoadingRevocationsNotificationName"), object: nil,
+                    userInfo: ["name" : localize("Downloading the certificate revocations metadata"), "progress" : progress])
                 
                 if let zipdata = zipdata  {
                     self.processReadZipData(kid: part.kid, zipData: zipdata)
@@ -272,8 +272,8 @@ class RevocationWorker {
 
             index += 1.0
             let progress: Float = index/Float(partitions.count)
-            center.post(name: Notification.Name("LoadingRevocationsNotificationName".localized), object: nil,
-                userInfo: ["name" : "Updating the certificate revocations metadata".localized, "progress" : progress])
+            center.post(name: Notification.Name("LoadingRevocationsNotificationName"), object: nil,
+                userInfo: ["name" : localize("Updating the certificate revocations metadata"), "progress" : progress])
 
             let filteredPartitions = localPartitions.filter({ $0.value(forKey: "kid") as! String == loadedPartitionKID &&
                 $0.value(forKey: "id") as? String == loadedPartitionID})

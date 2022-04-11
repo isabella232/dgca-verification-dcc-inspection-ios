@@ -39,22 +39,22 @@ public extension VerificationResult {
     var validityResult: String {
         switch self {
         case .valid:
-            return "Valid".localized
+            return localize("Valid")
         case .invalid:
-            return "Invalid".localized
+            return localize("Invalid")
         case .partlyValid:
-            return "Limited validity".localized
+            return localize("Limited validity")
         }
     }
         
     var validityButtonTitle: String {
         switch self {
         case .valid:
-            return "Done".localized
+            return localize("Done")
         case .invalid:
-            return "Retry".localized
+            return localize("Retry")
         case .partlyValid:
-            return "Retry".localized
+            return localize("Retry")
         }
     }
         

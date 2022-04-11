@@ -106,16 +106,16 @@ public class DCCCertificateValidator {
     private func findValidityFailures() -> [String] {
       var failures = [String]()
       if !certificate.cryptographicallyValid {
-        failures.append("No entries in the certificate.".localized)
+        failures.append(localize("No entries in the certificate."))
       }
       if certificate.exp < HCert.clock {
-        failures.append("Certificate past expiration date.".localized)
+        failures.append(localize("Certificate past expiration date."))
       }
       if certificate.iat > HCert.clock {
-        failures.append("Certificate issuance date is in the future.".localized)
+        failures.append(localize("Certificate issuance date is in the future."))
       }
       if certificate.statement == nil {
-        failures.append("No entries in the certificate.".localized)
+        failures.append(localize("No entries in the certificate."))
         return failures
       }
       failures.append(contentsOf: certificate.statement.validityFailures)
@@ -145,7 +145,7 @@ public class DCCCertificateValidator {
             
             if failsAndOpen.count > 0 {
                 validity = .partlyValid
-                infoSection = InfoSection(header: "Possible limitation", content: "Country rules validation failed")
+                infoSection = InfoSection(header: localize("Possible limitation"), content: localize("Country rules validation failed"))
                 var listOfRulesSection: [InfoSection] = []
                 result.sorted(by: { $0.result.rawValue < $1.result.rawValue }).forEach { validationResult in
                     if let error = validationResult.validationErrors?.first {

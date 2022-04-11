@@ -44,8 +44,7 @@ let package = Package(
                 "DGCCoreLibrary"
             ],
             resources: [
-                .copy("Resources/Assets.xcassets"),
-                .copy("Resources/DCCRevocation.xcdatamodeld")
+                .process("Resources")
             ]
         ),
         .testTarget(name: "DCCInspectionTests",

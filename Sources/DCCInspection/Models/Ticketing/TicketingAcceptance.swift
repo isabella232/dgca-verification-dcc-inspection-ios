@@ -38,15 +38,15 @@ public struct TicketingAcceptance {
     public var certificateRecords: [CertificateRecord] {
       guard let vcValue = accessInfo.vc else { return [] }
       var records = [CertificateRecord]()
-      records.append(CertificateRecord(keyName: "Name".localized, value: "\(vcValue.gnt) \(vcValue.fnt)"))
-      records.append(CertificateRecord(keyName: "Date of birth".localized, value: vcValue.dob))
-      records.append(CertificateRecord(keyName: "Departure".localized, value: "\(vcValue.cod),\(vcValue.rod)"))
-      records.append(CertificateRecord(keyName: "Arrival".localized, value:  "\(vcValue.coa),\(vcValue.roa)"))
-      records.append(CertificateRecord(keyName: "Accepted certificate type".localized, value: vcValue.type.joined(separator: ",")))
-      records.append(CertificateRecord(keyName: "Category".localized, value: vcValue.category.joined(separator: ",")))
-      records.append(CertificateRecord(keyName: "Validation Time".localized, value: vcValue.validationClock))
-      records.append(CertificateRecord(keyName: "Valid from".localized, value: vcValue.validFrom))
-      records.append(CertificateRecord(keyName: "Valid to".localized, value: vcValue.validTo))
+      records.append(CertificateRecord(keyName: localize("Name"), value: "\(vcValue.gnt) \(vcValue.fnt)"))
+      records.append(CertificateRecord(keyName: localize("Date of birth"), value: vcValue.dob))
+      records.append(CertificateRecord(keyName: localize("Departure"), value: "\(vcValue.cod),\(vcValue.rod)"))
+      records.append(CertificateRecord(keyName: localize("Arrival"), value:  "\(vcValue.coa),\(vcValue.roa)"))
+      records.append(CertificateRecord(keyName: localize("Accepted certificate type"), value: vcValue.type.joined(separator: ",")))
+      records.append(CertificateRecord(keyName: localize("Category"), value: vcValue.category.joined(separator: ",")))
+      records.append(CertificateRecord(keyName: localize("Validation Time"), value: vcValue.validationClock))
+      records.append(CertificateRecord(keyName: localize("Valid from"), value: vcValue.validFrom))
+      records.append(CertificateRecord(keyName: localize("Valid to"), value: vcValue.validTo))
 
       return records
     }
@@ -149,9 +149,9 @@ public struct TicketingAcceptance {
     }
     
     private func encrypt(data: Data, with key: SecKey) -> (Data?, String?) {
-      guard let publicKey = SecKeyCopyPublicKey(key) else { return (nil, "Cannot retrieve public key.".localized) }
+      guard let publicKey = SecKeyCopyPublicKey(key) else { return (nil, localize("Cannot retrieve public key.")) }
       guard SecKeyIsAlgorithmSupported(publicKey, .encrypt, SecKeyAlgorithm.rsaEncryptionOAEPSHA256) else {
-        return (nil, "Algorithm is not supported.".localized)
+        return (nil, localize("Algorithm is not supported."))
       }
       var error: Unmanaged<CFError>?
       let cipherData = SecKeyCreateEncryptedData(publicKey,
