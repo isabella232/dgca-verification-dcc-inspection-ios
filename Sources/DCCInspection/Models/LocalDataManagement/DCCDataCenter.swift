@@ -31,12 +31,15 @@ import DGCCoreLibrary
 import CertLogic
 
 public class DCCDataCenter {
+
     public static var appVersion: String {
-        return (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "?.?.?"
+        let versionValue = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "?.?.?"
+        let buildNumValue = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "?.?.?"
+        return "\(versionValue)(\(buildNumValue))"
     }
-    
-    public static let localDataManager: LocalDataManager = LocalDataManager()
-    public static let localImageManager: LocalImageManager = LocalImageManager()
+
+    public static let localDataManager = LocalDataManager()
+    public static let localImageManager = LocalImageManager()
     
     static let revocationWorker: RevocationWorker = RevocationWorker()
     
@@ -335,31 +338,41 @@ extension DCCDataCenter {
             
             group.enter()
             GatewayConnection.updateLocalDataStorage { err in
-                if err != nil { errorOccured = true }
+                if err != nil {
+                    errorOccured = true
+                }
                 group.leave()
             }
             
             group.enter()
             GatewayConnection.loadCountryList { list, err in
-                if err != nil { errorOccured = true }
+                if err != nil {
+                    errorOccured = true
+                }
                 group.leave()
             }
             
             group.enter()
             GatewayConnection.loadValueSetsFromServer { list, err in
-                if err != nil { errorOccured = true }
+                if err != nil {
+                    errorOccured = true
+                }
                 group.leave()
             }
             
             group.enter()
             GatewayConnection.lookup(certStrings: certStrings) { success, _, err in
-                if err != nil { errorOccured = true }
+                if err != nil {
+                    errorOccured = true
+                }
               group.leave()
             }
             
             group.enter()
             GatewayConnection.loadRulesFromServer { list, err  in
-                if err != nil { errorOccured = true }
+                if err != nil {
+                    errorOccured = true
+                }
               CertLogicManager.shared.setRules(ruleList: rules)
               group.leave()
             }

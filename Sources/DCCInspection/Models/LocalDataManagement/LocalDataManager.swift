@@ -139,9 +139,9 @@ public class LocalDataManager {
                 loadedData.config = self.localData.config
                 loadedData.lastLaunchedAppVersion = DCCDataCenter.appVersion
             }
+            DCCInspection.publicKeyEncoder = LocalDataKeyEncoder()
             self.localData = loadedData
             self.save(completion: completion)
-            DCCInspection.publicKeyEncoder = LocalDataKeyEncoder()
         }
     }
 }
