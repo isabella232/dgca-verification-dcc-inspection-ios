@@ -53,7 +53,7 @@ public class DCCSectionBuilder {
     private func makeRevocationSections() {
         infoSection.removeAll()
         
-        let hSection = InfoSection(header: localize("Certificate Type"), content: localize("HCertType." + certificate.certificateType.rawValue))
+        let hSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString)
         infoSection += [hSection]
         
         let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
@@ -100,7 +100,7 @@ public class DCCSectionBuilder {
     }
     
     private func makeSectionForRuleError(ruleSection: InfoSection, for appType: AppType) {
-        let hSection = InfoSection(header: localize("Certificate Type"), content: localize("HCertType." + certificate.certificateType.rawValue) )
+        let hSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString )
         infoSection += [hSection]
 
         guard !validityState.isRevoked else {
@@ -136,7 +136,7 @@ public class DCCSectionBuilder {
 
      private func makeSectionsForVerifier(includeInvalidSection: Bool = true) {
         if includeInvalidSection {
-            let hSection = InfoSection( header: localize("Certificate Type"), content:  localize("HCertType." + certificate.certificateType.rawValue) )
+            let hSection = InfoSection( header: localize("Certificate Type"), content: certificate.certTypeString )
             infoSection += [hSection]
             if validityState.isRevoked {
                 let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
@@ -173,7 +173,7 @@ public class DCCSectionBuilder {
     
     private func makeSectionsForVaccine(includeInvalidSection: Bool = true) {
         if includeInvalidSection {
-            let cSection = InfoSection( header: localize("Certificate Type"), content: localize("HCertType." + certificate.certificateType.rawValue))
+            let cSection = InfoSection( header: localize("Certificate Type"), content: certificate.certTypeString)
             infoSection += [cSection]
             
             if validityState.isRevoked {
@@ -200,7 +200,7 @@ public class DCCSectionBuilder {
     
     private func makeSectionsForTest(includeInvalidSection: Bool = true) {
         if includeInvalidSection {
-            let cSection = InfoSection(header: localize("Certificate Type"), content: localize("HCertType." + certificate.certificateType.rawValue))
+            let cSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString)
             infoSection += [cSection]
             if validityState.isRevoked  {
                 let rSection = InfoSection(header: localize("Reason for Invalidity"), content:localize( "Certificate has been revoked"))
@@ -225,7 +225,7 @@ public class DCCSectionBuilder {
 
     private func makeSectionsForRecovery(includeInvalidSection: Bool = true) {
         if includeInvalidSection {
-            let hSection = InfoSection(header: localize("Certificate Type"), content: localize("HCertType." + certificate.certificateType.rawValue))
+            let hSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString)
             infoSection += [hSection]
             if validityState.isRevoked  {
                 let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))

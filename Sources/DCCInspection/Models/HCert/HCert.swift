@@ -88,6 +88,10 @@ public class HCert: CertificationProtocol, Codable {
         }
         return fullName
     }
+
+    public var certTypeString: String {
+        localize(certificateType) + (statement == nil ? "" : " \(statement.typeAddon)")
+    }
       
     public var uvci: String {
         statement?.uvci ?? "empty"
