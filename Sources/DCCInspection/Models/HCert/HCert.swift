@@ -90,7 +90,7 @@ public class HCert: CertificationProtocol, Codable {
     }
 
     public var certTypeString: String {
-        localize(certificateType) + (statement == nil ? "" : " \(statement.typeAddon)")
+        localize("HCertType" + certificateType.rawValue) + (statement == nil ? "" : " \(statement.typeAddon)")
     }
       
     public var uvci: String {
