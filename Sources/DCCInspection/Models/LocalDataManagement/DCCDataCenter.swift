@@ -37,7 +37,7 @@ public class DCCDataCenter {
         let buildNumValue = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "?.?.?"
         return "\(versionValue)(\(buildNumValue))"
     }
-
+    
     public static let localDataManager = LocalDataManager()
     public static let localImageManager = LocalImageManager()
     
@@ -148,7 +148,7 @@ public class DCCDataCenter {
     public static func addValueSets(_ list: [ValueSet]) {
         list.forEach { localDataManager.add(valueSet: $0) }
     }
-
+    
     public static func addRules(_ list: [Rule]) {
         list.forEach { localDataManager.add(rule: $0) }
     }
@@ -232,23 +232,23 @@ extension DCCDataCenter {
                 group.leave()
                 CertLogicManager.shared.setRules(ruleList: rules)
             }
-        }
-        group.wait()
         
-        group.enter()
-        revocationWorker.processReloadRevocations { error in
-            if let err = error {
-                if case let .failedValidation(status: status) = err, status == 404 {
-                    group.enter()
-                    revocationWorker.processReloadRevocations { err in
-                        if err != nil { errorOccured = true }
-                        group.leave()
+            group.enter()
+            revocationWorker.processReloadRevocations { error in
+                if let err = error {
+                    if case let .failedValidation(status: status) = err, status == 404 {
+                        group.enter()
+                        revocationWorker.processReloadRevocations { err in
+                            if err != nil { errorOccured = true }
+                            group.leave()
+                        }
                     }
+                    errorOccured = true
                 }
-                errorOccured = true
+                group.leave()
             }
-            group.leave()
         }
+            
         
         group.notify(queue: .main) {
             if errorOccured == true {
