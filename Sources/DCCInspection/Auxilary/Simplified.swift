@@ -35,3 +35,16 @@ struct SimpleRevocationModel {
     let expires: Date
     let lastUpdated: Date
 }
+
+struct SimpleSlice {
+    let kid: String
+    let partID: String
+    let chunkID: String
+    let version: String
+    let hashID: String
+    let expiredDate: Date
+    var hashData: Data?
+    let type: String
+    
+    var dateString: String?
+}
