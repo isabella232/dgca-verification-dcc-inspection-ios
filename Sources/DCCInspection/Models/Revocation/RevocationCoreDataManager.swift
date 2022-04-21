@@ -39,11 +39,10 @@ public enum DataBaseError: Error {
 typealias LoadingCompletion = ([NSManagedObject]?, DataBaseError?) -> Void
 
 class RevocationCoreDataManager: NSObject {
-        
+    
     var managedContext: NSManagedObjectContext! = {
         return RevocationCoreDataStorage.shared.persistentContainer.viewContext
     }()
-
     
     // MARK: - Revocations
     func clearAllData() {
@@ -66,7 +65,7 @@ class RevocationCoreDataManager: NSObject {
             DGCLogger.logInfo("Error: Could not fetch Revocations for deleting.")
         }
     }
-
+    
     func loadRevocation(kid: String) -> Revocation? {
         let fetchRequest = NSFetchRequest<Revocation>(entityName: "Revocation")
         let predicate: NSPredicate = NSPredicate(format: "kid == %@", argumentArray: [kid])
@@ -108,7 +107,7 @@ class RevocationCoreDataManager: NSObject {
             DGCLogger.logInfo("Error: Could not fetch Revocations for deleting.")
         }
     }
-
+    
     func currentRevocations() -> [Revocation] {
         let fetchRequest = NSFetchRequest<Revocation>(entityName: "Revocation")
         do {
@@ -123,7 +122,7 @@ class RevocationCoreDataManager: NSObject {
         }
         return []
     }
-
+    
     func createAndSaveRevocations(_ models: [RevocationModel]) {
         for model in models {
             let kid = model.kid
@@ -230,6 +229,36 @@ class RevocationCoreDataManager: NSObject {
         }
     }
     
+    func createAndSaveChunk(kid: String, id: String, cid: String, sliceModel: [String : SliceModel]) {
+        let partition = loadPartition(kid: kid, id: id)
+        let chunkEntity = NSEntityDescription.entity(forEntityName: "Chunk", in: managedContext)!
+        let chunk = Chunk(entity: chunkEntity, insertInto: managedContext)
+        
+        let slices: NSMutableOrderedSet = []
+        for sliceKey in sliceModel.keys {
+            let slice: Slice = createSlice(expDate: sliceKey, sliceModel: sliceModel[sliceKey]!)
+            slice.setValue(chunk, forKey: "chunk")
+            slices.add(slice)
+        }
+        chunk.setValue(cid, forKey: "cid")
+        chunk.setValue(slices, forKey: "slices")
+        chunk.setValue(partition, forKey: "partition")
+        
+        RevocationCoreDataStorage.shared.saveContext()
+    }
+    
+    func createAndSaveSlice(kid: String, id: String, cid: String, sliceKey: String, sliceModel: SliceModel) {
+        if let chunk = loadChunk(kid: kid, id: id, cid: cid) {
+            let slice: Slice = createSlice(expDate: sliceKey, sliceModel: sliceModel)
+            slice.setValue(chunk, forKey: "chunk")
+            let slices = chunk.value(forKey: "slices") as? NSMutableOrderedSet
+            slices?.add(slice)
+            chunk.setValue(slices, forKey: "slices")
+            
+            RevocationCoreDataStorage.shared.saveContext()
+        }
+    }
+    
     func deleteExpiredPartitions() {
         let date = Date()
         let fetchRequest = NSFetchRequest<Partition>(entityName: "Partition")
@@ -270,6 +299,38 @@ class RevocationCoreDataManager: NSObject {
         }
     }
   
+    func deleteChunk(_ chunk: Chunk) {
+        managedContext.delete(chunk)
+        RevocationCoreDataStorage.shared.saveContext()
+    }
+
+    func deleteSlice(_ slice: Slice) {
+        managedContext.delete(slice)
+        RevocationCoreDataStorage.shared.saveContext()
+    }
+
+    func deleteSlice(kid: String, id: String, cid: String, hashID: String) {
+        let fetchRequest = NSFetchRequest<Slice>(entityName: "Slice")
+        let predicate = NSPredicate(format: "chunk.partition.kid == %@ AND chunk.partition.id == %@ AND chunk.cid == %@ AND hashID == %@",
+            argumentArray: [kid, id, cid, hashID])
+        fetchRequest.predicate = predicate
+        
+        do {
+            let slices = try managedContext.fetch(fetchRequest)
+            slices.forEach { managedContext.delete($0) }
+            
+            if !slices.isEmpty {
+                RevocationCoreDataStorage.shared.saveContext()
+                DGCLogger.logInfo("==  Deleted \(slices.count) slices for kid: \(kid), id: \(id), cid: \(cid), hashID: \(hashID)")
+            }
+            
+        } catch let error as NSError {
+            DGCLogger.logInfo("Could not fetch slices. Error: \(error.localizedDescription) for for kid: \(kid), id: \(id), cid: \(cid), hashID: \(hashID)")
+        } catch {
+            DGCLogger.logInfo("Could not fetch slices for for kid: \(kid), id: \(id), cid: \(cid), hashID: \(hashID)")
+        }
+    }
+
     func loadAllPartitions(for kid: String) -> [Partition]? {
         let fetchRequest = NSFetchRequest<Partition>(entityName: "Partition")
         let predicate: NSPredicate = NSPredicate(format: "kid == %@", argumentArray: [kid])
@@ -305,7 +366,6 @@ class RevocationCoreDataManager: NSObject {
         return nil
     }
 
-    // MARK: - Chunks & Slices
     func loadChunk(kid: String, id: String, cid: String) -> Chunk? {
         let today = Date()
         let fetchRequest = NSFetchRequest<Chunk>(entityName: "Chunk")
@@ -344,7 +404,8 @@ class RevocationCoreDataManager: NSObject {
         }
         return nil
     }
-
+    
+    // MARK: - Chunks & Slices
     func loadSlices(kid: String, x: String, y: String, section cid: String) -> [Slice]? {
         let fetchRequest = NSFetchRequest<Slice>(entityName: "Slice")
         let today = Date()
@@ -396,67 +457,5 @@ class RevocationCoreDataManager: NSObject {
             chunkSet.add(chunk)
         }
         return chunkSet
-    }
-    
-    func deleteChunk(_ chunk: Chunk) {
-        managedContext.delete(chunk)
-        RevocationCoreDataStorage.shared.saveContext()
-    }
-
-    func deleteSlice(_ slice: Slice) {
-        managedContext.delete(slice)
-        RevocationCoreDataStorage.shared.saveContext()
-    }
-
-    func deleteSlice(kid: String, id: String, cid: String, hashID: String) {
-        let fetchRequest = NSFetchRequest<Slice>(entityName: "Slice")
-        let predicate = NSPredicate(format: "chunk.partition.kid == %@ AND chunk.partition.id == %@ AND chunk.cid == %@ AND hashID == %@",
-            argumentArray: [kid, id, cid, hashID])
-        fetchRequest.predicate = predicate
-        
-        do {
-            let slices = try managedContext.fetch(fetchRequest)
-            slices.forEach { managedContext.delete($0) }
-            
-            if !slices.isEmpty {
-                RevocationCoreDataStorage.shared.saveContext()
-                DGCLogger.logInfo("==  Deleted \(slices.count) slices for kid: \(kid), id: \(id), cid: \(cid), hashID: \(hashID)")
-            }
-            
-        } catch let error as NSError {
-            DGCLogger.logInfo("Could not fetch slices. Error: \(error.localizedDescription) for for kid: \(kid), id: \(id), cid: \(cid), hashID: \(hashID)")
-        } catch {
-            DGCLogger.logInfo("Could not fetch slices for for kid: \(kid), id: \(id), cid: \(cid), hashID: \(hashID)")
-        }
-    }
-    
-    func createAndSaveChunk(kid: String, id: String, cid: String, sliceModel: [String : SliceModel]) {
-        let partition = loadPartition(kid: kid, id: id)
-        let chunkEntity = NSEntityDescription.entity(forEntityName: "Chunk", in: managedContext)!
-        let chunk = Chunk(entity: chunkEntity, insertInto: managedContext)
-        
-        let slices: NSMutableOrderedSet = []
-        for sliceKey in sliceModel.keys {
-            let slice: Slice = createSlice(expDate: sliceKey, sliceModel: sliceModel[sliceKey]!)
-            slice.setValue(chunk, forKey: "chunk")
-            slices.add(slice)
-        }
-        chunk.setValue(cid, forKey: "cid")
-        chunk.setValue(slices, forKey: "slices")
-        chunk.setValue(partition, forKey: "partition")
-        
-        RevocationCoreDataStorage.shared.saveContext()
-    }
-    
-    func createAndSaveSlice(kid: String, id: String, cid: String, sliceKey: String, sliceModel: SliceModel) {
-        if let chunk = loadChunk(kid: kid, id: id, cid: cid) {
-            let slice: Slice = createSlice(expDate: sliceKey, sliceModel: sliceModel)
-            slice.setValue(chunk, forKey: "chunk")
-            let slices = chunk.value(forKey: "slices") as? NSMutableOrderedSet
-            slices?.add(slice)
-            chunk.setValue(slices, forKey: "slices")
-            
-            RevocationCoreDataStorage.shared.saveContext()
-        }
     }
 }

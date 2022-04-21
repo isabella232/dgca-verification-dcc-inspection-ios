@@ -18,22 +18,26 @@
  * limitations under the License.
  * ---license-end
  */
-//  
+//
 //  Simplified.swift
 //  DGCAVerifier
-//  
+//
 //  Created by Igor Khomiak on 17.03.2022.
-//  
+//
         
 
 import Foundation
 
-struct SimpleRevocationModel {
+struct SimpleRevocation {
     let kid: String
     let mode: String
     let hashTypes: String
     let expires: Date
     let lastUpdated: Date
+    
+    var lastUpdatedString: String {
+        return lastUpdated.dateOffsetString
+    }
 }
 
 struct SimpleSlice {

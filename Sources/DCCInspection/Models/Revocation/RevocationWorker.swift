@@ -75,7 +75,7 @@ class RevocationWorker {
             }
         }
     }
-
+    
     private func processReviewRevocations(_ models: [RevocationModel]) -> ([RevocationModel], [RevocationModel]) {
         // 8) Delete all KID entries in all tables which are not on this list.
         
@@ -117,7 +117,7 @@ class RevocationWorker {
         }
         return (newlyAddedRevocations, revocationsToReload)
     }
-
+    
     private func processDownloadNewRevocations(_ revocations: [RevocationModel], completion: @escaping ProcessingCompletion) {
        self.downloadNewRevocations(revocations: revocations) { partitions, err in
             guard err == nil else {
@@ -250,7 +250,7 @@ class RevocationWorker {
              completion(nil)
         }
     }
-
+    
     // MARK: - update Partitions
     private func updateExistedPartitions(_ partitions: [PartitionModel], completion: @escaping ProcessingCompletion) {
         let todayDate = Date()
@@ -364,7 +364,7 @@ class RevocationWorker {
                 }
                 
             } else {
-                DGCLogger.logInfo("###  Partition with KID: \(loadedPartition.kid), id: \(String(describing: loadedPartition.id)) is up to date")
+                print("###  Partition with KID: \(loadedPartition.kid), id: \(String(describing: loadedPartition.id)) is up to date")
             }
         } // partitions
         
@@ -372,9 +372,8 @@ class RevocationWorker {
              completion(nil)
         }
     }
-
-    private func processAndUpdateSlice(loadedSlice: SimpleSlice, localSlice: SimpleSlice, dateString: String?,
-            completion: @escaping ProcessingCompletion) {
+    
+    private func processAndUpdateSlice(loadedSlice: SimpleSlice, localSlice: SimpleSlice, dateString: String?,  completion: @escaping ProcessingCompletion) {
         if localSlice.expiredDate < Date() {
             DispatchQueue.main.async {
                 self.revocationCoreDataManager.deleteSlice(kid: localSlice.kid, id: localSlice.partID, cid: localSlice.chunkID, hashID: localSlice.hashID)
@@ -389,16 +388,16 @@ class RevocationWorker {
                 }
                 if let data = data  {
                     self.processReadZipData(kid: loadedSlice.kid, zipData: data)
-                    DGCLogger.logInfo("###   Updated Slice with KID: \(loadedSlice.kid), id: \(loadedSlice.partID), cid: \(localSlice.chunkID), hashID: \(localSlice.hashID)")
+                    print("###   Updated Slice with KID: \(loadedSlice.kid), id: \(loadedSlice.partID), cid: \(localSlice.chunkID), hashID: \(localSlice.hashID)")
                 }
                 completion(nil)
             }
         } else {
-            DGCLogger.logInfo("###   Slice with KID: \(loadedSlice.kid), id: \(loadedSlice.partID), cid: \(localSlice.chunkID), hashID: \(localSlice.hashID) is up to date")
+            print("###   Slice with KID: \(loadedSlice.kid), id: \(loadedSlice.partID), cid: \(localSlice.chunkID), hashID: \(localSlice.hashID) is up to date")
             completion(nil)
         }
     }
-
+    
     private func createAndSaveSlice(kid: String, id: String, cid: String, sliceKey: String, sliceModel: SliceModel, completion: @escaping ProcessingCompletion) {
         // local chunk is absent
         if Thread.isMainThread {
@@ -431,6 +430,7 @@ class RevocationWorker {
                 self.revocationCoreDataManager.createAndSaveChunk(kid: kid, id: id, cid: cid, sliceModel: sliceModel)
             }
         }
+        
         let kidForLoad = Helper.convertToBase64url(base64: kid)
         self.revocationService.getRevocationPartitionChunk(for: kidForLoad, id: id, cid: cid, dateString: nil, completion: { [unowned self] data, err in
             guard err == nil else {
@@ -467,12 +467,11 @@ class RevocationWorker {
                 }
             }
         } catch {
-            DGCLogger.logInfo("Data error")
+            print("Data error")
         }
     }
-
+    
     // MARK: - Auxilary methods
-
     private func removeRevocation(kid: String) {
         DispatchQueue.main.async {
             self.revocationCoreDataManager.removeRevocation(kid: kid)
@@ -509,14 +508,15 @@ class RevocationWorker {
         return localPartitions
     }
 
-    private func makeRevocationModel(revocation: NSManagedObject) -> SimpleRevocationModel? {
+    private func makeRevocationModel(revocation: Revocation) -> SimpleRevocation? {
         if let localKid = revocation.value(forKey: "kid") as? String,
             let localMode = revocation.value(forKey: "mode") as? String,
             let localHashTypes = revocation.value(forKey: "hashTypes") as? String,
             let localModifiedDate = revocation.value(forKey: "lastUpdated") as? Date,
             let localExpiredDate = revocation.value(forKey: "expires") as? Date {
             
-            let model = SimpleRevocationModel(kid: localKid, mode: localMode, hashTypes: localHashTypes, expires: localExpiredDate, lastUpdated: localModifiedDate)
+            let model = SimpleRevocation(kid: localKid, mode: localMode, hashTypes: localHashTypes,
+                expires: localExpiredDate, lastUpdated: localModifiedDate)
             return model
         }
         return nil
@@ -538,5 +538,4 @@ class RevocationWorker {
         }
         return nil
     }
-
 }
