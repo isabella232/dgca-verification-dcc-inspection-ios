@@ -162,41 +162,38 @@ public class DCCDataCenter {
 // MARK: - loading Verifier Data
 extension DCCDataCenter {
     static func prepareVerifierLocalData(completion: @escaping DataCompletionHandler) {
-        let group = DispatchGroup()
-        group.enter()
+
         localDataManager.loadLocallyStoredData { result in
             CertLogicManager.shared.setRules(ruleList: rules)
-            group.leave()
-        }
-        group.wait()
-        
-        let areNotDownloadedData = countryCodes.isEmpty || rules.isEmpty || valueSets.isEmpty
-        let shouldReloadData = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
-        
-        if areNotDownloadedData || shouldReloadData {
-            reloadVerifierStorageData { result in
-                if case .failure(_) = result {
-                    if areNotDownloadedData {
-                        completion(.noData)
-                    } else {
-                        completion(result)
-                    }
-                } else {
-                    localDataManager.loadLocallyStoredData { result in
-                        let areNotDownloadedData = countryCodes.isEmpty || rules.isEmpty || valueSets.isEmpty
+
+            let areNotDownloadedData = countryCodes.isEmpty || rules.isEmpty || valueSets.isEmpty
+            let shouldReloadData = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
+            
+            if areNotDownloadedData || shouldReloadData {
+                reloadVerifierStorageData { result in
+                    if case .failure(_) = result {
                         if areNotDownloadedData {
                             completion(.noData)
+                        } else {
+                            completion(result)
                         }
-                        CertLogicManager.shared.setRules(ruleList: rules)
-                        completion(.success)
+                    } else {
+                        localDataManager.loadLocallyStoredData { result in
+                            let areNotDownloadedData = countryCodes.isEmpty || rules.isEmpty || valueSets.isEmpty
+                            if areNotDownloadedData {
+                                completion(.noData)
+                            }
+                            CertLogicManager.shared.setRules(ruleList: rules)
+                            completion(.success)
+                        }
                     }
                 }
-            }
-            
-        } else {
-            localDataManager.loadLocallyStoredData { result in
-                CertLogicManager.shared.setRules(ruleList: rules)
-                completion(result)
+                
+            } else {
+                localDataManager.loadLocallyStoredData { result in
+                    CertLogicManager.shared.setRules(ruleList: rules)
+                    completion(result)
+                }
             }
         }
     }
