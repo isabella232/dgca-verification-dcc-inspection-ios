@@ -177,11 +177,14 @@ extension DCCDataCenter {
                         } else {
                             completion(result)
                         }
+                        return
+                        
                     } else {
                         localDataManager.loadLocallyStoredData { result in
                             let areNotDownloadedData = countryCodes.isEmpty || rules.isEmpty || valueSets.isEmpty
                             if areNotDownloadedData {
                                 completion(.noData)
+                                return
                             }
                             CertLogicManager.shared.setRules(ruleList: rules)
                             completion(.success)
