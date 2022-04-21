@@ -68,7 +68,7 @@ public enum Icons: String {
   case error = "\u{f05e}"
 }
 
-public var sliceType: SliceType = .BLOOMFILTER
+public var sliceType: SliceType = .VARHASHLIST
 
 public enum SliceType: String {
    case BLOOMFILTER, VARHASHLIST
