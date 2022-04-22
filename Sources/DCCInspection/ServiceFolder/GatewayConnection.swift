@@ -32,6 +32,7 @@ import SwiftyJSON
 import CertLogic
 import JWTDecode
 
+
 public enum GatewayError: Error {
   case insufficientData
   case encodingError
@@ -45,18 +46,18 @@ public enum GatewayError: Error {
   case tokenError
 }
 
-public typealias GatewayCompletion = (GatewayError?) -> Void
-public typealias CertUpdateCompletion = (String?, String?, GatewayError?) -> Void
+typealias GatewayCompletion = (GatewayError?) -> Void
+typealias CertUpdateCompletion = (String?, String?, GatewayError?) -> Void
 
-public typealias CertStatusCompletion = ([String]?, GatewayError?) -> Void
-public typealias ValueSetsCompletion = ([ValueSet]?, GatewayError?) -> Void
-public typealias ValueSetCompletionHandler = (ValueSet?, GatewayError?) -> Void
-public typealias RulesCompletion = ([Rule]?, GatewayError?) -> Void
-public typealias RuleCompletionHandler = (Rule?, GatewayError?) -> Void
-public typealias CountryCompletionHandler = ([CountryModel]?, GatewayError?) -> Void
+typealias CertStatusCompletion = ([String]?, GatewayError?) -> Void
+typealias ValueSetsCompletion = ([ValueSet]?, GatewayError?) -> Void
+typealias ValueSetCompletionHandler = (ValueSet?, GatewayError?) -> Void
+typealias RulesCompletion = ([Rule]?, GatewayError?) -> Void
+typealias RuleCompletionHandler = (Rule?, GatewayError?) -> Void
+typealias CountryCompletionHandler = ([CountryModel]?, GatewayError?) -> Void
 
 public class GatewayConnection: ContextConnection {
-    public static func certUpdate(resume resumeToken: String? = nil, completion: @escaping CertUpdateCompletion) {
+    static func certUpdate(resume resumeToken: String? = nil, completion: @escaping CertUpdateCompletion) {
         var headers = [String: String]()
         if let token = resumeToken {
             headers["x-resume-token"] = token
@@ -88,7 +89,7 @@ public class GatewayConnection: ContextConnection {
         }
     }
     
-    public static func certStatus(resume resumeToken: String? = nil, completion: @escaping CertStatusCompletion) {
+    static func certStatus(resume resumeToken: String? = nil, completion: @escaping CertStatusCompletion) {
         request(["endpoints", "status"]).response {
             guard case let .success(result) = $0.result,
                 let response = result,
@@ -103,7 +104,7 @@ public class GatewayConnection: ContextConnection {
         }
     }
     
-    public static func updateLocalDataStorage(completion: @escaping GatewayCompletion) {
+    static func updateLocalDataStorage(completion: @escaping GatewayCompletion) {
         certUpdate(resume: DCCDataCenter.resumeToken) { encodedCert, token, err in
             guard err == nil else {
                 completion(GatewayError.connection(error: err!))
@@ -168,7 +169,7 @@ public class GatewayConnection: ContextConnection {
 }
 
 // MARK: Country, Rules, Valuesets extension
-public extension GatewayConnection {
+extension GatewayConnection {
     // MARK: Country List
     static func getListOfCountry(completion: @escaping CountryCompletionHandler) {
         request(["endpoints", "countryList"], method: .get).response {
@@ -400,7 +401,7 @@ public extension GatewayConnection {
         }
     }
     
-	static func lookup(certStrings: [DatedCertString], completion: @escaping ContextCompletion) {
+    static func lookup(certStrings: [DatedCertString], completion: @escaping ContextCompletion) {
 			 guard certStrings.count != 0 else { completion(true, nil, nil); return; }
 			// construct certs from strings
 			var certs: [Date: HCert] = [:]
@@ -481,7 +482,7 @@ public extension GatewayConnection {
 public typealias TicketingCompletion = (AccessTokenResponse?, GatewayError?) -> Void
 public typealias ContextCompletion = (Bool, String?, GatewayError?) -> Void
 
-public extension GatewayConnection {
+extension GatewayConnection {
     static func loadAccessToken(_ url : URL, servicePath : String, publicKey: String, completion: @escaping TicketingCompletion) {
         let json: [String: Any] = ["service": servicePath, "pubKey": publicKey]
         

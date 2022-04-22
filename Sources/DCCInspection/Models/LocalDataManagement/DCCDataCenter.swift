@@ -365,7 +365,7 @@ extension DCCDataCenter {
                 if err != nil {
                     errorOccured = true
                 }
-              group.leave()
+                group.leave()
             }
             
             group.enter()
