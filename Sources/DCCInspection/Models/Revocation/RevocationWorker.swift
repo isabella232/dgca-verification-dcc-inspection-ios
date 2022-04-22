@@ -364,7 +364,7 @@ class RevocationWorker {
                 }
                 
             } else {
-                print("###  Partition with KID: \(loadedPartition.kid), id: \(String(describing: loadedPartition.id)) is up to date")
+                DGCLogger.logInfo("###  Partition with KID: \(loadedPartition.kid), id: \(String(describing: loadedPartition.id)) is up to date")
             }
         } // partitions
         
@@ -388,12 +388,12 @@ class RevocationWorker {
                 }
                 if let data = data  {
                     self.processReadZipData(kid: loadedSlice.kid, zipData: data)
-                    print("###   Updated Slice with KID: \(loadedSlice.kid), id: \(loadedSlice.partID), cid: \(localSlice.chunkID), hashID: \(localSlice.hashID)")
+                    DGCLogger.logInfo("###   Updated Slice with KID: \(loadedSlice.kid), id: \(loadedSlice.partID), cid: \(localSlice.chunkID), hashID: \(localSlice.hashID)")
                 }
                 completion(nil)
             }
         } else {
-            print("###   Slice with KID: \(loadedSlice.kid), id: \(loadedSlice.partID), cid: \(localSlice.chunkID), hashID: \(localSlice.hashID) is up to date")
+            DGCLogger.logInfo("###   Slice with KID: \(loadedSlice.kid), id: \(loadedSlice.partID), cid: \(localSlice.chunkID), hashID: \(localSlice.hashID) is up to date")
             completion(nil)
         }
     }
@@ -467,7 +467,7 @@ class RevocationWorker {
                 }
             }
         } catch {
-            print("Data error")
+            DGCLogger.logError(error)
         }
     }
     

@@ -213,7 +213,7 @@ public class HCert: CertificationProtocol, Codable {
                 throw CertificateParsingError.parsing(errors: parsingErrors)
             }
         } else {
-            print("Wrong EU_DGC Version!")
+            DGCLogger.logInfo("Wrong EU_DGC Version!")
             parsingErrors.append(.version(error: "Wrong EU_DGC Version!"))
             throw CertificateParsingError.parsing(errors: parsingErrors)
         }
@@ -241,7 +241,7 @@ extension HCert {
             
             #if DEBUG
             if DCCInspection.config.debugPrintJsonErrors {
-                 validation.errors?.forEach { print($0.description) }
+                 validation.errors?.forEach { DGCLogger.logInfo($0.description) }
             }
             #endif
             return bodyErrors

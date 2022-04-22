@@ -297,7 +297,7 @@ extension ZipManager {
            do {
                try FileManager.default.removeItem(atPath: certURL.path)
            } catch {
-               print(error.localizedDescription)
+               DGCLogger.logError(error)
                throw error
            }
          }
@@ -305,7 +305,7 @@ extension ZipManager {
          do {
              try FileManager.default.createDirectory(at: certURL, withIntermediateDirectories: false, attributes: nil)
          } catch {
-             print(error.localizedDescription)
+             DGCLogger.logError(error)
              throw error
          }
     }
@@ -358,8 +358,8 @@ extension ZipManager {
 
               completion(tmpUrl, nil)
             } catch {
-              print(error.localizedDescription)
-              completion(nil, error)
+                DGCLogger.logError(error)
+                completion(nil, error)
             }
         }
     }

@@ -40,36 +40,7 @@ public class DCCCertificateValidator {
     public init(with cert: HCert) {
       self.certificate = cert
     }
-    
-    public func validateWalletCertificate() -> ValidityState {
-        let failures = findValidityFailures()
-        
-        let technicalValidity: VerificationResult = failures.isEmpty ? .valid : .invalid
-        let issuerValidity = validateCertLogicForIssuer()
-        let destinationValidity = validateCertLogicForDestination()
-        let travalerValidity = validateCertLogicForTraveller()
-        
-        let (infoRulesSection, allRulesValidity): (InfoSection?, VerificationResult)
-        if technicalValidity == .valid {
-            (infoRulesSection, allRulesValidity) = validateCertLogicForAllRules()
-        } else {
-            (infoRulesSection, allRulesValidity) = (nil, .invalid)
-        }
-        
-        let validityState: ValidityState = ValidityState(
-            technicalValidity: technicalValidity,
-            issuerValidity: issuerValidity,
-            destinationValidity: destinationValidity,
-            travalerValidity: travalerValidity,
-            allRulesValidity: allRulesValidity,
-            validityFailures: failures,
-            infoSection: infoRulesSection,
-            isRevoked: false
-        )
 
-       return validityState
-    }
-    
     public func validateDCCCertificate() -> ValidityState {
         let failures = findValidityFailures()
         
@@ -83,13 +54,13 @@ public class DCCCertificateValidator {
         } else {
             (infoRulesSection, allRulesValidity) = (nil, .invalid)
         }
-        var revocationValue: Bool = true
+        var isRevoked: Bool = false
         
         if technicalValidity != .invalid {
-            revocationValue = self.validateRevocation()
+            isRevoked = self.validateRevocation()
         }
         
-        let validityState: ValidityState = ValidityState(
+        let validityState = ValidityState(
             technicalValidity: technicalValidity,
             issuerValidity: issuerValidity,
             destinationValidity: destinationValidity,
@@ -97,29 +68,27 @@ public class DCCCertificateValidator {
             allRulesValidity: allRulesValidity,
             validityFailures: failures,
             infoSection: infoRulesSection,
-            isRevoked: revocationValue
-        )
-        
+            isRevoked: isRevoked)
         return validityState
-  }
+    }
   
     private func findValidityFailures() -> [String] {
-      var failures = [String]()
-      if !certificate.cryptographicallyValid {
-        failures.append(localize("No entries in the certificate."))
-      }
-      if certificate.exp < HCert.clock {
-        failures.append(localize("Certificate past expiration date."))
-      }
-      if certificate.iat > HCert.clock {
-        failures.append(localize("Certificate issuance date is in the future."))
-      }
-      if certificate.statement == nil {
-        failures.append(localize("No entries in the certificate."))
+        var failures = [String]()
+        if !certificate.cryptographicallyValid {
+          failures.append(localize("No entries in the certificate."))
+        }
+        if certificate.exp < HCert.clock {
+          failures.append(localize("Certificate past expiration date."))
+        }
+        if certificate.iat > HCert.clock {
+          failures.append(localize("Certificate issuance date is in the future."))
+        }
+        if certificate.statement == nil {
+          failures.append(localize("No entries in the certificate."))
+          return failures
+        }
+        failures.append(contentsOf: certificate.statement.validityFailures)
         return failures
-      }
-      failures.append(contentsOf: certificate.statement.validityFailures)
-      return failures
     }
 
     // MARK: - private validation methods
@@ -148,28 +117,25 @@ public class DCCCertificateValidator {
                 infoSection = InfoSection(header: localize("Possible limitation"), content: localize("Country rules validation failed"))
                 var listOfRulesSection: [InfoSection] = []
                 result.sorted(by: { $0.result.rawValue < $1.result.rawValue }).forEach { validationResult in
-                    if let error = validationResult.validationErrors?.first {
-                        switch validationResult.result {
-                        case .fail:
-                            listOfRulesSection.append(InfoSection(header: "CirtLogic Engine error",
-                                content: error.localizedDescription,
-                                countryName: certificate.ruleCountryCode,
-                                ruleValidationResult: .invalid)
-                            )
-                        case .open:
-                            listOfRulesSection.append(InfoSection(header: "CirtLogic Engine error",
-                                content: error.localizedDescription,
-                                countryName: certificate.ruleCountryCode,
-                                ruleValidationResult: .partlyValid)
-                              )
-                        case .passed:
-                            listOfRulesSection.append(InfoSection(header: "CirtLogic Engine error",
-                                content: error.localizedDescription,
-                                countryName: certificate.ruleCountryCode,
-                                ruleValidationResult: .valid)
-                            )
-                        }
-
+                  if let error = validationResult.validationErrors?.first {
+                      switch validationResult.result {
+                      case .fail:
+                          listOfRulesSection.append(InfoSection(header: localize("Cannot validate the certificate"),
+                            content: error.localizedDescription,
+                            countryName: certificate.ruleCountryCode,
+                            ruleValidationResult: .invalid))
+                      case .open:
+                          listOfRulesSection.append(InfoSection(header: localize("Cannot validate the certificate"),
+                            content: error.localizedDescription,
+                            countryName: certificate.ruleCountryCode,
+                            ruleValidationResult: .partlyValid))
+                      case .passed:
+                          listOfRulesSection.append(InfoSection(header: localize("Cannot validate the certificate"),
+                            content: error.localizedDescription,
+                            countryName: certificate.ruleCountryCode,
+                            ruleValidationResult: .valid))
+                      }
+                      
                     } else {
                         let preferredLanguage = Locale.preferredLanguages[0] as String
                         let arr = preferredLanguage.components(separatedBy: "-")
@@ -185,23 +151,22 @@ public class DCCCertificateValidator {
                         }
                         switch validationResult.result {
                         case .fail:
-                            listOfRulesSection.append(InfoSection(header: errorString,
+                          listOfRulesSection.append(InfoSection(header: errorString,
                               content: detailsError,
                               countryName: certificate.ruleCountryCode,
                               ruleValidationResult: .invalid)
-                            )
+                          )
                         case .open:
-                            listOfRulesSection.append(InfoSection(header: errorString,
+                          listOfRulesSection.append(InfoSection(header: errorString,
                               content: detailsError,
                               countryName: certificate.ruleCountryCode,
                               ruleValidationResult: .partlyValid)
-                            )
+                          )
                         case .passed:
-                            listOfRulesSection.append(InfoSection(header: errorString,
+                          listOfRulesSection.append(InfoSection(header: errorString,
                               content: detailsError,
                               countryName: certificate.ruleCountryCode,
-                              ruleValidationResult: .valid)
-                            )
+                              ruleValidationResult: .valid))
                         }
                     }
                 }
@@ -215,9 +180,7 @@ public class DCCCertificateValidator {
         let certType = certificationType(for: certificate.certificateType)
         if let countryCode = certificate.ruleCountryCode {
             let valueSets = DCCDataCenter.localDataManager.getValueSetsForExternalParameters()
-            let filterParameter = FilterParameter(validationClock: Date(),
-                countryCode: countryCode,
-                certificationType: certType)
+            let filterParameter = FilterParameter(validationClock: Date(), countryCode: countryCode, certificationType: certType)
             let externalParameters = ExternalParameter(validationClock: Date(),
                valueSets: valueSets,
                exp: certificate.exp,
@@ -228,24 +191,22 @@ public class DCCCertificateValidator {
                 external: externalParameters, payload: certificate.body.description)
             let fails = result.filter { $0.result == .fail }
             if !fails.isEmpty {
-              return .invalid
+                return .invalid
             }
             let open = result.filter { $0.result == .open }
             if !open.isEmpty {
-              return .partlyValid
+                return .partlyValid
             }
         }
         return .valid
     }
-    
+
     private func validateCertLogicForDestination() -> VerificationResult {
         let certType = certificationType(for: certificate.certificateType)
         if let countryCode = certificate.ruleCountryCode {
             let valueSets = DCCDataCenter.localDataManager.getValueSetsForExternalParameters()
               
-            let filterParameter = FilterParameter(validationClock: Date(),
-              countryCode: countryCode,
-              certificationType: certType)
+            let filterParameter = FilterParameter(validationClock: Date(), countryCode: countryCode, certificationType: certType)
               
             let externalParameters = ExternalParameter(validationClock: Date(),
               valueSets: valueSets,
@@ -253,15 +214,15 @@ public class DCCCertificateValidator {
               iat: certificate.iat,
               issuerCountryCode: certificate.issCode,
               kid: certificate.kidStr)
-            let result = CertLogicManager.shared.validateDestination(filter: filterParameter,
-                external: externalParameters, payload: certificate.body.description)
+            let result = CertLogicManager.shared.validateDestination(filter: filterParameter, external: externalParameters,
+                payload: certificate.body.description)
             let fails = result.filter { $0.result == .fail }
             if !fails.isEmpty {
-              return .invalid
+                return .invalid
             }
             let open = result.filter { $0.result == .open }
             if !open.isEmpty {
-              return .partlyValid
+                return .partlyValid
             }
         }
         return .valid
@@ -285,16 +246,16 @@ public class DCCCertificateValidator {
             
             let fails = result.filter { $0.result == .fail }
             if !fails.isEmpty {
-              return .invalid
+                return .invalid
             }
             let open = result.filter { $0.result == .open }
             if !open.isEmpty {
-              return .partlyValid
+                return .partlyValid
             }
         }
         return .valid
     }
-    
+
     private func certificationType(for type: HCertType) -> CertificateType {
         switch type {
         case .recovery:
@@ -308,6 +269,7 @@ public class DCCCertificateValidator {
         }
     }
 }
+
 
 extension DCCCertificateValidator {
     
@@ -364,7 +326,7 @@ extension DCCCertificateValidator {
                     return true
                 }
             } else {
-                print("Revocation Error: Unsupported type of hash")
+                DGCLogger.logInfo("Revocation Error: Unsupported type of hash")
             }
         }
         return false

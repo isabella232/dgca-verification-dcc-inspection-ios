@@ -153,10 +153,6 @@ public class GatewayConnection: ContextConnection {
             DCCDataCenter.lastFetch = Date()
             DCCDataCenter.saveLocalData { result in
                 if DCCDataCenter.localDataManager.versionedConfig["outdated"].bool == true {
-//                    DispatchQueue.main.async {
-//                      (UIApplication.shared.windows.first?.rootViewController as? UINavigationController)?
-//                          .popToRootViewController(animated: false)
-//                    }
                 }
                 completion()
             }

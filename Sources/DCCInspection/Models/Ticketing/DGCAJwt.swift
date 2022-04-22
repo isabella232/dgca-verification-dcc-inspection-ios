@@ -76,7 +76,7 @@ public class DGCAJwt {
 					}
 				}
 			} catch {
-				print(error)
+                DGCLogger.logError(error)
 				completion(false, nil, error)
 				return
 			}

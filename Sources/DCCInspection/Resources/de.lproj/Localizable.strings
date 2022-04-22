@@ -148,3 +148,6 @@
 
 //County Code scanner
 "Country codes list empty" = "Liste der Ländercodes leer";
+"Cannot validate the certificate" = "Cannot validate the certificate";
+"Possible limitation" = "Possible limitation";
+"Country rules validation failed" = "Country rules validation failed";

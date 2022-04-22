@@ -399,3 +399,6 @@
 
 //County Code scanner
 "Country codes list empty" = "Country codes list empty";
+"Cannot validate the certificate" = "Cannot validate the certificate";
+"Possible limitation" = "Possible limitation";
+"Country rules validation failed" = "Country rules validation failed";
