@@ -281,7 +281,7 @@ extension DCCCertificateValidator {
             let hashTypes = revocation.value(forKey: "hashTypes") as? String {
             let arrayHashTypes = hashTypes.split(separator: ",")
             
-            if arrayHashTypes.contains("SIGNATURE"), let hashData = certificate.signatureHash {
+            if arrayHashTypes.contains("SIGNATURE"), let hashData = certificate.signatureHash?.dropLast(16) {
                 let lookup: CertLookUp = certificate.lookUp(mode: revocMode, hash: hashData)
                 let result = searchInDatabase(lookUp: lookup, hash: hashData)
                 if result == true {
@@ -289,7 +289,7 @@ extension DCCCertificateValidator {
                 }
             }
             
-            if arrayHashTypes.contains("UCI"), let hashData = certificate.uvciHash {
+            if arrayHashTypes.contains("UCI"), let hashData = certificate.uvciHash?.dropLast(16) {
                 let lookup: CertLookUp = certificate.lookUp(mode: revocMode, hash: hashData)
                 let result = searchInDatabase(lookUp: lookup, hash: hashData)
                 if result == true {
@@ -297,7 +297,7 @@ extension DCCCertificateValidator {
                 }
             }
             
-            if arrayHashTypes.contains("COUNTRYCODEUCI"), let hashData = certificate.countryCodeUvciHash {
+            if arrayHashTypes.contains("COUNTRYCODEUCI"), let hashData = certificate.countryCodeUvciHash?.dropLast(16) {
                 let lookup: CertLookUp = certificate.lookUp(mode: revocMode, hash: hashData)
                 let result = searchInDatabase(lookUp: lookup, hash: hashData)
                 if result == true {

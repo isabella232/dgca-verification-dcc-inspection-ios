@@ -254,10 +254,9 @@ extension HCert {
 // MARK: - Hashes for revocation search
 extension HCert {
     public var uvciHash: Data? {
-        if statement?.uvci != nil,
-           let uvciData = uvci.data(using: .utf8) {
-           let data = SHA256.sha256(data: uvciData)
-            return data.dropLast(16)
+        if statement?.uvci != nil, let uvciData = uvci.data(using: .utf8) {
+            let data = SHA256.sha256(data: uvciData)
+            return data
         } else {
             return nil
         }
@@ -266,7 +265,7 @@ extension HCert {
     public var countryCodeUvciHash: Data? {
         if statement?.uvci != nil, let countryCodeUvciData = (issCode + uvci).data(using: .utf8) {
             let data = SHA256.sha256(data: countryCodeUvciData)
-			return data.dropLast(16)
+			return data
         } else {
             return nil
         }
@@ -279,7 +278,7 @@ extension HCert {
             signatureBytesToHash = Array(signatureBytesToHash.prefix(32))
         }
         let data = SHA256.sha256(data: Data(signatureBytesToHash))
-        return data.dropLast(16)
+        return data
     }
 
     private var isECDSASigned: Bool {
