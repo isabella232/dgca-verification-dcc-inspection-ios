@@ -140,7 +140,7 @@ public class DCCDataCenter {
             localImageManager.localData.pdfs = newValue
         }
     }
-
+    
     public static func saveLocalData(completion: @escaping DataCompletionHandler) {
         localDataManager.save(completion: completion)
     }
@@ -152,7 +152,7 @@ public class DCCDataCenter {
     public static func addRules(_ list: [Rule]) {
         list.forEach { localDataManager.add(rule: $0) }
     }
-
+    
     public static func addCountries(_ list: [CountryModel]) {
         localDataManager.localData.countryCodes.removeAll()
         list.forEach { localDataManager.add(country: $0) }
@@ -162,10 +162,10 @@ public class DCCDataCenter {
 // MARK: - loading Verifier Data
 extension DCCDataCenter {
     static func prepareVerifierLocalData(completion: @escaping DataCompletionHandler) {
-
+        
         localDataManager.loadLocallyStoredData { result in
             CertLogicManager.shared.setRules(ruleList: rules)
-
+            
             let areNotDownloadedData = countryCodes.isEmpty || rules.isEmpty || valueSets.isEmpty
             let shouldReloadData = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
             
@@ -200,11 +200,12 @@ extension DCCDataCenter {
             }
         }
     }
-
+    
     static func reloadVerifierStorageData(completion: @escaping DataCompletionHandler) {
         let group = DispatchGroup()
-                
+        
         var errorOccured = false
+        group.enter()
         localDataManager.loadLocallyStoredData { result in
             CertLogicManager.shared.setRules(ruleList: rules)
             
@@ -224,7 +225,7 @@ extension DCCDataCenter {
             GatewayConnection.loadValueSetsFromServer { list, err in
                 if err != nil { errorOccured = true }
                 group.leave()
-             }
+            }
             
             group.enter()
             GatewayConnection.loadRulesFromServer { list, err  in
@@ -232,7 +233,7 @@ extension DCCDataCenter {
                 group.leave()
                 CertLogicManager.shared.setRules(ruleList: rules)
             }
-        
+            
             group.enter()
             revocationWorker.processReloadRevocations { error in
                 if let err = error {
@@ -247,8 +248,8 @@ extension DCCDataCenter {
                 }
                 group.leave()
             }
+            group.leave()
         }
-            
         
         group.notify(queue: .main) {
             if errorOccured == true {
@@ -267,40 +268,21 @@ extension DCCDataCenter {
 // MARK: - loading Wallet Data
 extension DCCDataCenter {
     static func prepareWalletLocalData(completion: @escaping DataCompletionHandler) {
-        let group = DispatchGroup()
-        var requestResult: DataOperationResult = .success
-        
-        group.enter()
         initializeWalletStorageData { result in
-            requestResult = result
             CertLogicManager.shared.setRules(ruleList: rules)
             
             let shouldDownload = self.downloadedDataHasExpired || self.appWasRunWithOlderVersion
             if !shouldDownload {
-                group.notify(queue: .main) {
-                    completion(.success)
-                }
-                
+                completion(.success)
+            
             } else {
-                group.enter()
                 reloadWalletStorageData { result in
-                    requestResult = result
-                    group.enter()
                     localDataManager.loadLocallyStoredData { result in
-                        requestResult = result
                         CertLogicManager.shared.setRules(ruleList: rules)
-                        group.leave()
+                        completion(result)
                     }
-                    
-                    group.leave()
                 }
             }
-            
-            group.leave()
-        }
-        
-        group.notify(queue: .main) {
-            completion(requestResult)
         }
     }
     
@@ -310,16 +292,17 @@ extension DCCDataCenter {
         group.enter()
         localDataManager.loadLocallyStoredData { result in
             CertLogicManager.shared.setRules(ruleList: rules)
-            group.leave()
-        }
-        
-        group.enter()
-        localImageManager.loadLocallyStoredData { result in
-          group.leave()
-        }
-        
-        group.enter()
-        GatewayConnection.lookup(certStrings: certStrings) { success, _, err in
+            
+            group.enter()
+            localImageManager.loadLocallyStoredData { result in
+              group.leave()
+            }
+            
+            group.enter()
+            GatewayConnection.lookup(certStrings: certStrings) { success, _, err in
+                group.leave()
+            }
+            
             group.leave()
         }
         
@@ -376,15 +359,16 @@ extension DCCDataCenter {
               CertLogicManager.shared.setRules(ruleList: rules)
               group.leave()
             }
-
+            
             group.leave()
         }
-    
+        
         group.notify(queue: .main) {
             if errorOccured == true {
                 DispatchQueue.main.async {
                     completion(.failure(.noInputData))
                 }
+                
             } else {
                 lastFetch = Date()
                 lastLaunchedAppVersion = Self.appVersion
