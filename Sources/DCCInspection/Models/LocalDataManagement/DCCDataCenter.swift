@@ -40,7 +40,6 @@ public class DCCDataCenter {
     
     public static let localDataManager = LocalDataManager()
     public static let localImageManager = LocalImageManager()
-    
     static let revocationWorker: RevocationWorker = RevocationWorker()
     
     public static var downloadedDataHasExpired: Bool {
