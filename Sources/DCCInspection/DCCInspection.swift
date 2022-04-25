@@ -71,7 +71,7 @@ public final class DCCInspection: CertificateInspection {
         }
     }
     
-    public func validateCertificate(_ certificate: CertificationProtocol) -> VerifyingProtocol {
+    public func validateCertificate(_ certificate: CertificationProtocol) -> ValidityState {
         let validator = DCCCertificateValidator(with: certificate as! HCert)
         let validityState = validator.validateDCCCertificate()
         return validityState

@@ -38,24 +38,6 @@ public enum HCertType: String {
   case unknown
 }
 
-public class ParseErrors {
-  var errors: [ParseError] = []
-}
-
-public enum ParseError {
-  case base45
-  case prefix
-  case zlib
-  case cbor
-  case json(error: String)
-  case version(error: String)
-}
-
-public enum CertificateParsingError: Error {
-    case unknown
-    case parsing(errors: [ParseError])
-}
-
 public enum RevocationMode: String {
     case point = "POINT"
     case vector = "VECTOR"
