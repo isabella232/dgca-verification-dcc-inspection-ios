@@ -65,7 +65,7 @@ public final class DCCInspection: CertificateInspection {
         switch appType {
         case .verifier:
             DCCDataCenter.reloadVerifierStorageData(completion: completion)
-
+        
         case .wallet:
             DCCDataCenter.reloadWalletStorageData(completion: completion)
         }
