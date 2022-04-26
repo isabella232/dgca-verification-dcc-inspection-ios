@@ -478,7 +478,7 @@ public extension GatewayConnection {
 public typealias TicketingCompletion = (AccessTokenResponse?, GatewayError?) -> Void
 public typealias ContextCompletion = (Bool, String?, GatewayError?) -> Void
 
-extension GatewayConnection {
+public extension GatewayConnection {
     static func loadAccessToken(_ url : URL, servicePath : String, publicKey: String, completion: @escaping TicketingCompletion) {
         let json: [String: Any] = ["service": servicePath, "pubKey": publicKey]
         
