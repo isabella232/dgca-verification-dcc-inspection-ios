@@ -44,9 +44,12 @@ public final class DCCInspection: CertificateInspection {
     static var publicKeyEncoder: PublicKeyStorageDelegate?
     static var config = HCertConfig.default
     
+    public static var downloadedDataHasExpired: Bool {
+        return DCCDataCenter.downloadedDataHasExpired
+    }
     
     public init() { }
-            
+    
     public var lastUpdate: Date {
         DCCDataCenter.lastFetch
     }
@@ -55,7 +58,7 @@ public final class DCCInspection: CertificateInspection {
         switch appType {
         case .verifier:
             DCCDataCenter.prepareVerifierLocalData(completion: completion)
-
+            
         case .wallet:
             DCCDataCenter.prepareWalletLocalData(completion: completion)
         }
