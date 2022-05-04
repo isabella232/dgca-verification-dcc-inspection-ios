@@ -44,16 +44,16 @@ public final class DCCInspection: CertificateInspection {
     static var publicKeyEncoder: PublicKeyStorageDelegate?
     static var config = HCertConfig.default
     
-    public static var downloadedDataHasExpired: Bool {
+    public var downloadedDataHasExpired: Bool {
         return DCCDataCenter.downloadedDataHasExpired
     }
-    
-    public init() { }
     
     public var lastUpdate: Date {
         DCCDataCenter.lastFetch
     }
     
+    public init() { }
+
     public func prepareLocallyStoredData(appType: AppType, completion: @escaping DataCompletionHandler) {
         switch appType {
         case .verifier:
