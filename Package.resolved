@@ -78,7 +78,7 @@
         "repositoryURL": "https://github.com/eu-digital-green-certificates/dgca-verification-core-library.git",
         "state": {
           "branch": "main",
-          "revision": "48b662a12dd0f054bd766e4d170d705e13170559",
+          "revision": "954e9b9b4379b90498d2cddc194be784b1463b93",
           "version": null
         }
       },
@@ -86,9 +86,9 @@
         "package": "jsonlogic",
         "repositoryURL": "https://github.com/eu-digital-green-certificates/json-logic-swift.git",
         "state": {
-          "branch": "feat/dccDateOfBirth",
-          "revision": "948c4c820f9c36dad2149c05b4e2dd1cc1ef3b3f",
-          "version": null
+          "branch": null,
+          "revision": "c830f34a35753f4d441bd291e40e4a4feee9ede0",
+          "version": "1.1.9"
         }
       },
       {
