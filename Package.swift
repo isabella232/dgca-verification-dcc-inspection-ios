@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.3
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -15,7 +15,7 @@ let package = Package(
     
     dependencies: [
         // Dependencies declare other packages that this package depends on. feat/dccDateOfBirth
-        .package(name: "jsonlogic", url: "https://github.com/eu-digital-green-certificates/json-logic-swift.git", .branch("master")),
+        .package(name: "jsonlogic", url: "https://github.com/eu-digital-green-certificates/json-logic-swift.git", from: "1.2.0"),
         .package(name: "SWCompression", url: "https://github.com/tsolomko/SWCompression.git", from: "4.7.0"),
         .package(name: "Alamofire", url: "https://github.com/Alamofire/Alamofire", from: "5.5.0"),
         .package(name: "JSONSchema", url: "https://github.com/eu-digital-green-certificates/JSONSchema.swift", .branch("master")),
@@ -43,9 +43,7 @@ let package = Package(
                 "JWTDecode",
                 "DGCCoreLibrary"
             ],
-            resources: [
-                .process("Resources")
-            ]
+            resources: [ .process("Resources") ]
         ),
         .testTarget(name: "DCCInspectionTests",
             dependencies: ["DCCInspection"]),
