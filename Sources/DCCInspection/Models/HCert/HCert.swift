@@ -158,7 +158,7 @@ public class HCert: CertificationProtocol, Codable {
     }
     
     public static var clockOverride: Date?
-
+    
     public required init(payload: String, ruleCountryCode: String? = nil) throws {
 		var copyPayload = payload
 		self.isRevoked = false
@@ -176,7 +176,7 @@ public class HCert: CertificationProtocol, Codable {
 		  fullPayloadString = supportedPrefix + copyPayload
 		  payloadString = copyPayload
 		}
-            
+        
         self.ruleCountryCode = ruleCountryCode
         guard let compressed = try? payloadString.fromBase45() else {
             throw CertificateParsingError.parsing(errors: [ParseError.base45])
