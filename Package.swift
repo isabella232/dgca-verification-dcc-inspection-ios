@@ -15,7 +15,7 @@ let package = Package(
     
     dependencies: [
         // Dependencies declare other packages that this package depends on. feat/dccDateOfBirth
-        .package(name: "JsonLogic", url: "https://github.com/eu-digital-green-certificates/json-logic-swift.git", .branch("master")), //from: "1.2.0"),
+        .package(name: "JsonLogic", url: "https://github.com/eu-digital-green-certificates/json-logic-swift.git", .branch("feat/fiixed-cert-logic")), //from: "1.2.0"),
         .package(name: "SWCompression", url: "https://github.com/tsolomko/SWCompression.git", from: "4.7.0"),
         .package(name: "Alamofire", url: "https://github.com/Alamofire/Alamofire", from: "5.5.0"),
         .package(name: "JSONSchema", url: "https://github.com/eu-digital-green-certificates/JSONSchema.swift", .branch("master")),
