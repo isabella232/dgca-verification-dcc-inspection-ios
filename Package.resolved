@@ -65,11 +65,11 @@
         }
       },
       {
-        "package": "DGCCoreLibrary",
-        "repositoryURL": "https://github.com/eu-digital-green-certificates/dgca-verification-core-library.git",
+        "package": "DGCPartialVarHashFilter",
+        "repositoryURL": "https://github.com/eu-digital-green-certificates/dgca-partialvarhashfilter-ios.git",
         "state": {
           "branch": "main",
-          "revision": "2934a0f21f65f19bea541e65e4486c5473cfadff",
+          "revision": "723a2f636b31aa100fb76c31bd86a5c8ea4dfcf3",
           "version": null
         }
       },
