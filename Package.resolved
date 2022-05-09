@@ -83,12 +83,12 @@
         }
       },
       {
-        "package": "jsonlogic",
+        "package": "JsonLogic",
         "repositoryURL": "https://github.com/eu-digital-green-certificates/json-logic-swift.git",
         "state": {
-          "branch": null,
-          "revision": "e037d03a3c26f869f3752f950c0edf3d27c5ae6f",
-          "version": "1.2.0"
+          "branch": "master",
+          "revision": "e23d2dab87691f03194e755521d0ffd924d64cd6",
+          "version": null
         }
       },
       {
