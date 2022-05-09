@@ -26,7 +26,7 @@
 //  
         
 
-import UIKit
+import Foundation
 import PDFKit
 
 public class SavedPDF: Codable {

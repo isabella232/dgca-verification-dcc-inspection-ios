@@ -71,7 +71,7 @@ public struct RecoveryEntry: HCertEntry {
         return fail
     }
 
-    enum Fields: String {
+    internal enum Fields: String {
         case diseaseTargeted = "tg"
         case firstPositiveDate = "fr"
         case countryCode = "co"
@@ -81,7 +81,7 @@ public struct RecoveryEntry: HCertEntry {
         case uvci = "ci"
     }
 
-    init?(body: JSON) {
+    internal init?(body: JSON) {
         guard
             let diseaseTargeted = body[Fields.diseaseTargeted.rawValue].string,
             let firstPositiveDate = body[Fields.firstPositiveDate.rawValue].string,

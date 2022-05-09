@@ -94,15 +94,16 @@ public class DCCCertificateValidator {
     // MARK: - private validation methods
     private func validateCertLogicForAllRules() -> (InfoSection?, VerificationResult) {
         var validity: VerificationResult = .valid
+        let today = Date()
         let certType = certificationType(for: certificate.certificateType)
         var infoSection: InfoSection?
       
         if let countryCode = certificate.ruleCountryCode {
             let valueSets = DCCDataCenter.localDataManager.getValueSetsForExternalParameters()
-            let filterParameter = FilterParameter(validationClock: Date(),
+            let filterParameter = FilterParameter(validationClock: today,
                 countryCode: countryCode,
                 certificationType: certType)
-            let externalParameters = ExternalParameter(validationClock: Date(),
+            let externalParameters = ExternalParameter(validationClock: today,
                  valueSets: valueSets,
                  exp: certificate.exp,
                  iat: certificate.iat,
@@ -178,10 +179,11 @@ public class DCCCertificateValidator {
 
     private func validateCertLogicForIssuer() -> VerificationResult {
         let certType = certificationType(for: certificate.certificateType)
+        let today = Date()
         if let countryCode = certificate.ruleCountryCode {
             let valueSets = DCCDataCenter.localDataManager.getValueSetsForExternalParameters()
-            let filterParameter = FilterParameter(validationClock: Date(), countryCode: countryCode, certificationType: certType)
-            let externalParameters = ExternalParameter(validationClock: Date(),
+            let filterParameter = FilterParameter(validationClock: today, countryCode: countryCode, certificationType: certType)
+            let externalParameters = ExternalParameter(validationClock: today,
                valueSets: valueSets,
                exp: certificate.exp,
                iat: certificate.iat,
@@ -203,12 +205,13 @@ public class DCCCertificateValidator {
 
     private func validateCertLogicForDestination() -> VerificationResult {
         let certType = certificationType(for: certificate.certificateType)
+        let today = Date()
         if let countryCode = certificate.ruleCountryCode {
             let valueSets = DCCDataCenter.localDataManager.getValueSetsForExternalParameters()
               
-            let filterParameter = FilterParameter(validationClock: Date(), countryCode: countryCode, certificationType: certType)
+            let filterParameter = FilterParameter(validationClock: today, countryCode: countryCode, certificationType: certType)
               
-            let externalParameters = ExternalParameter(validationClock: Date(),
+            let externalParameters = ExternalParameter(validationClock: today,
               valueSets: valueSets,
               exp: certificate.exp,
               iat: certificate.iat,
@@ -230,12 +233,13 @@ public class DCCCertificateValidator {
     
     private func validateCertLogicForTraveller() -> VerificationResult {
         let certType = certificationType(for: certificate.certificateType)
+        let today = Date()
         if let countryCode = certificate.ruleCountryCode {
             let valueSets = DCCDataCenter.localDataManager.getValueSetsForExternalParameters()
-            let filterParameter = FilterParameter(validationClock: Date(),
+            let filterParameter = FilterParameter(validationClock: today,
                 countryCode: countryCode,
                 certificationType: certType)
-            let externalParameters = ExternalParameter(validationClock: Date(),
+            let externalParameters = ExternalParameter(validationClock: today,
                valueSets: valueSets,
                exp: certificate.exp,
                iat: certificate.iat,

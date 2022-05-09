@@ -29,40 +29,37 @@ import Alamofire
 import DGCCoreLibrary
 
 public class CertEvaluator: ServerTrustEvaluating {
-  class CertError: Error {}
+    class CertError: Error {}
 
-  let pubKeys: [String]
+    let pubKeys: [String]
 
-  public func evaluate(_ trust: SecTrust, forHost host: String) throws {
-    let hashes: [String] = trust.af.publicKeys.compactMap { key in
-      guard
-        let der = SecKeyCopyExternalRepresentation(key, nil)
-      else {
-        return nil
-      }
-      return SHA256.digest(input: der as NSData).base64EncodedString()
+    public func evaluate(_ trust: SecTrust, forHost host: String) throws {
+        let hashes: [String] = trust.af.publicKeys.compactMap { key in
+            guard let der = SecKeyCopyExternalRepresentation(key, nil)
+            else { return nil }
+            return SHA256.digest(input: der as NSData).base64EncodedString()
+        }
+        for hash in (hashes + ["*"]) {
+            if pubKeys.contains(hash) {
+                DGCLogger.logInfo("SSL Pubkey matches. ✅")
+              return
+            }
+        }
+        #if !DEBUG || !targetEnvironment(simulator)
+        let failure = true
+        #else
+        let failure = false
+        #endif
+        if failure && 0 < 1 { // silence unreachable warning
+            throw Self.CertError()
+        }
+        let str1 = pubKeys.joined(separator: "\n")
+        DGCLogger.logError("FATAL: None of the hashes matched our public keys! These keys were loaded: \(str1)")
+        let str2 = hashes.joined(separator: "\n")
+        DGCLogger.logError("The server returned this chain: \(str2)")
     }
-    for hash in (hashes + ["*"]) {
-      if pubKeys.contains(hash) {
-        print("SSL Pubkey matches. ✅")
-        return
-      }
-    }
-    #if !DEBUG || !targetEnvironment(simulator)
-    let failure = true
-    #else
-    let failure = false
-    #endif
-    if failure && 0 < 1 { // silence unreachable warning
-      throw Self.CertError()
-    }
-    let str1 = pubKeys.joined(separator: "\n")
-    print("FATAL: None of the hashes matched our public keys! These keys were loaded: \(str1)")
-    let str2 = hashes.joined(separator: "\n")
-    print("The server returned this chain: \(str2)")
-  }
 
-  public init(pubKeys: [String]) {
-    self.pubKeys = pubKeys
-  }
+    public init(pubKeys: [String]) {
+      self.pubKeys = pubKeys
+    }
 }

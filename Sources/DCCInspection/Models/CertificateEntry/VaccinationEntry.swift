@@ -94,7 +94,7 @@ public struct VaccinationEntry: HCertEntry {
         case uvci = "ci"
     }
 
-    init?(body: JSON) {
+    internal init?(body: JSON) {
         guard
             let diseaseTargeted = body[Fields.diseaseTargeted.rawValue].string,
             let vaccineOrProphylaxis = body[Fields.vaccineOrProphylaxis.rawValue].string,

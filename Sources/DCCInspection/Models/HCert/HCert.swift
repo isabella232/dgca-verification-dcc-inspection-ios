@@ -31,7 +31,6 @@ import SwiftCBOR
 import DGCCoreLibrary
 
 public class HCert: CertificationProtocol, Codable {
-    
     public let fullPayloadString: String
     public let payloadString: String
     public let cborData: Data
@@ -110,19 +109,19 @@ public class HCert: CertificationProtocol, Codable {
         }
     }
 
-    var testStatements: [TestEntry] {
+    private var testStatements: [TestEntry] {
         return get(.testStatements).array?.compactMap {TestEntry(body: $0)} ?? []
     }
     
-    var vaccineStatements: [VaccinationEntry] {
+    private var vaccineStatements: [VaccinationEntry] {
         return get(.vaccineStatements).array?.compactMap { VaccinationEntry(body: $0) } ?? []
     }
     
-    var recoveryStatements: [RecoveryEntry] {
+    private var recoveryStatements: [RecoveryEntry] {
         return get(.recoveryStatements).array?.compactMap {RecoveryEntry(body: $0)} ?? []
     }
     
-    var statements: [HCertEntry] {
+    private var statements: [HCertEntry] {
         return testStatements + vaccineStatements + recoveryStatements
     }
     
@@ -273,14 +272,14 @@ extension HCert {
 
     public var signatureHash: Data? {
         guard var signatureBytesToHash = CBOR.unwrap(data: cborData)?.signatureBytes else { return nil }
-          
+        
         if isECDSASigned {
             signatureBytesToHash = Array(signatureBytesToHash.prefix(32))
         }
         let data = SHA256.sha256(data: Data(signatureBytesToHash))
         return data
     }
-
+    
     private var isECDSASigned: Bool {
         guard let cborHeader = CBOR.header(from: cborData), let algorithmField = cborHeader[1] else { return false }
         
