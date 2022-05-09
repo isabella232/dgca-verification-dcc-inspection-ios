@@ -59,8 +59,8 @@
         "package": "CertLogic",
         "repositoryURL": "https://github.com/eu-digital-green-certificates/dgc-certlogic-ios",
         "state": {
-          "branch": "main",
-          "revision": "01de90f368e8c9967a0c48be5ed2dda67ed7bece",
+          "branch": "feat/fiixed-cert-logic",
+          "revision": "bce577c0849f43ce217b2bc6eac6cf86c6b86843",
           "version": null
         }
       },

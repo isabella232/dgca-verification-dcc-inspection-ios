@@ -15,11 +15,11 @@ let package = Package(
     
     dependencies: [
         // Dependencies declare other packages that this package depends on. feat/dccDateOfBirth
-        .package(name: "JsonLogic", url: "https://github.com/eu-digital-green-certificates/json-logic-swift.git", .branch("feat/fiixed-cert-logic")), //from: "1.2.0"),
+        .package(name: "JsonLogic", url: "https://github.com/eu-digital-green-certificates/json-logic-swift.git", .branch("master")), //from: "1.2.0"),
         .package(name: "SWCompression", url: "https://github.com/tsolomko/SWCompression.git", from: "4.7.0"),
         .package(name: "Alamofire", url: "https://github.com/Alamofire/Alamofire", from: "5.5.0"),
         .package(name: "JSONSchema", url: "https://github.com/eu-digital-green-certificates/JSONSchema.swift", .branch("master")),
-        .package(name: "CertLogic", url: "https://github.com/eu-digital-green-certificates/dgc-certlogic-ios", .branch("main")),
+        .package(name: "CertLogic", url: "https://github.com/eu-digital-green-certificates/dgc-certlogic-ios", .branch("feat/fiixed-cert-logic")),
         .package(name: "DGCBloomFilter", url: "https://github.com/eu-digital-green-certificates/dgc-bloomfilter-ios.git", .branch("main")),
         .package(name: "DGCPartialVarHashFilter", url: "https://github.com/eu-digital-green-certificates/dgca-partialvarhashfilter-ios.git", .branch("main")),
         .package(name: "DGCCoreLibrary", url: "https://github.com/eu-digital-green-certificates/dgca-verification-core-library.git", .branch("main")),
