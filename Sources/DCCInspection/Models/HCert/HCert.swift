@@ -30,7 +30,7 @@ import JSONSchema
 import SwiftCBOR
 import DGCCoreLibrary
 
-public class HCert: CertificationProtocol, Codable {
+public class HCert: Codable {
     public let fullPayloadString: String
     public let payloadString: String
     public let cborData: Data
