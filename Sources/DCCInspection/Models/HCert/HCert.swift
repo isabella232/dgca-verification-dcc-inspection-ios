@@ -42,6 +42,8 @@ public class HCert: CertificationProtocol, Codable {
     public let exp: Date
     public var ruleCountryCode: String?
     public var isRevoked: Bool = false
+    public let isUntrusted: Bool
+
     
     public var dateOfBirth: String {
         return get(.dateOfBirth).string ?? ""
@@ -159,8 +161,11 @@ public class HCert: CertificationProtocol, Codable {
     public static var clockOverride: Date?
     
     public required init(payload: String, ruleCountryCode: String? = nil) throws {
-		var copyPayload = payload
 		self.isRevoked = false
+        self.isUntrusted = false
+        
+        var copyPayload = payload
+
 		if let firstChar = payload.first {
 		  if firstChar == "x" {
 			self.isRevoked = true
