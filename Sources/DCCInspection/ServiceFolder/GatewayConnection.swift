@@ -444,10 +444,9 @@ public extension GatewayConnection {
 								toBeChanged[date] = cert
 							}
 						} else {
-							if cert.isRevoked {
 								cert.isRevoked = false
 								toBeChanged[date] = cert
-							}
+							
 						}
 					}
 					var count = toBeChanged.count
