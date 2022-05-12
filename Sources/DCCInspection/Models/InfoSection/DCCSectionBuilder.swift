@@ -88,13 +88,13 @@ public class DCCSectionBuilder {
         case .wallet:
             switch certificate.certificateType {
             case .vaccine:
-                makeSectionsForVaccine()
+                makeSectionsForVaccine(includeInvalidSection: false)
             case .test:
-                makeSectionsForTest()
+                makeSectionsForTest(includeInvalidSection: false)
             case .recovery:
-                makeSectionsForRecovery()
+                makeSectionsForRecovery(includeInvalidSection: false)
             default:
-                makeSectionsForVerifier()
+                makeSectionsForVerifier(includeInvalidSection: false)
             }
         }
     }
