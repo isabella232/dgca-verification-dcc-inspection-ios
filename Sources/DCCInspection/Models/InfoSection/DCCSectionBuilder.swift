@@ -94,7 +94,7 @@ public class DCCSectionBuilder {
             case .recovery:
                 makeSectionsForRecovery(includeInvalidSection: false)
             default:
-                makeSectionsForVerifier(includeInvalidSection: false)
+                makeSectionsForVerifier()
             }
         }
     }
