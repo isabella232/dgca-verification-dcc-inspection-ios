@@ -318,13 +318,13 @@ extension DCCDataCenter {
         localDataManager.loadLocallyStoredData { result in
             CertLogicManager.shared.setRules(ruleList: rules)
             
-            group.enter()
-            GatewayConnection.updateLocalDataStorage { err in
-                if err != nil {
-                    errorOccured = true
-                }
-                group.leave()
-            }
+//            group.enter()
+//            GatewayConnection.updateLocalDataStorage { err in
+//                if err != nil {
+//                    errorOccured = true
+//                }
+//                group.leave()
+//            }
             
             group.enter()
             GatewayConnection.loadCountryList { list, err in
