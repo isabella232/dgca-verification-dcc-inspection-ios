@@ -179,10 +179,13 @@ public class DCCSectionBuilder {
             if validityState.isRevoked {
                 let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
                 infoSection += [rSection]
+                return
+                
             } else if !validityState.validityFailures.isEmpty {
                 let hSection = InfoSection(header: localize("Reason for Invalidity"),
                     content: validityState.validityFailures.joined(separator: " "))
                 infoSection += [hSection]
+                return
             }
         }
         
@@ -205,10 +208,13 @@ public class DCCSectionBuilder {
             if validityState.isRevoked  {
                 let rSection = InfoSection(header: localize("Reason for Invalidity"), content:localize( "Certificate has been revoked"))
                 infoSection += [rSection]
+                return
+                
             } else if !validityState.validityFailures.isEmpty {
                 let hSection = InfoSection(header: localize("Reason for Invalidity"),
                   content: validityState.validityFailures.joined(separator: " "))
                 infoSection += [hSection]
+                return
             }
         }
         let fullName = certificate.fullName
@@ -230,10 +236,13 @@ public class DCCSectionBuilder {
             if validityState.isRevoked  {
                 let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
                 infoSection += [rSection]
+                return
+                
             } else if !validityState.validityFailures.isEmpty {
               let vSection = InfoSection(header: localize("Reason for Invalidity"),
                   content: validityState.validityFailures.joined(separator: " "))
                 infoSection += [vSection]
+                return
             }
         }
         let fullName = certificate.fullName
