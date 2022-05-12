@@ -429,7 +429,7 @@ public extension GatewayConnection {
 						completion(false, nil, nil)
 						return
 					}
-					if response.count == 0 { completion(true, nil, nil); return }
+					// if response.count == 0 { completion(true, nil, nil); return }
 					// response is list of hashes that have been revoked
 					
 					let revokedHashes = response as [String]
@@ -444,9 +444,10 @@ public extension GatewayConnection {
 								toBeChanged[date] = cert
 							}
 						} else {
-								cert.isRevoked = false
-								toBeChanged[date] = cert
-							
+                            if cert.isRevoked {
+                                cert.isRevoked = false
+                                toBeChanged[date] = cert
+                            }
 						}
 					}
 					var count = toBeChanged.count
