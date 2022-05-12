@@ -56,7 +56,8 @@ public class DCCSectionBuilder {
         let hSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString)
         infoSection += [hSection]
         
-        let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
+        let rSection = InfoSection(header: localize("Reason for Invalidity"), content:
+            localize("The certificate has been revoked"))
         infoSection += [rSection]
         
         let famSection = InfoSection( header: localize("Standardised Family Name"),
@@ -104,7 +105,8 @@ public class DCCSectionBuilder {
         infoSection += [hSection]
 
         guard !validityState.isRevoked else {
-            let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
+            let rSection = InfoSection(header: localize("Reason for Invalidity"),
+                content: localize("The certificate has been revoked"))
             infoSection += [rSection]
             return
         }
@@ -172,12 +174,12 @@ public class DCCSectionBuilder {
     }
     
     private func makeSectionsForVaccine(includeInvalidSection: Bool = true) {
+        let cSection = InfoSection( header: localize("Certificate Type"), content: certificate.certTypeString)
+        infoSection += [cSection]
         if includeInvalidSection {
-            let cSection = InfoSection( header: localize("Certificate Type"), content: certificate.certTypeString)
-            infoSection += [cSection]
-            
             if validityState.isRevoked {
-                let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
+                let rSection = InfoSection(header: localize("Reason for Invalidity"),
+                    content: localize("The certificate has been revoked"))
                 infoSection += [rSection]
                 return
                 
@@ -202,11 +204,12 @@ public class DCCSectionBuilder {
     }
     
     private func makeSectionsForTest(includeInvalidSection: Bool = true) {
+        let cSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString)
+        infoSection += [cSection]
         if includeInvalidSection {
-            let cSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString)
-            infoSection += [cSection]
             if validityState.isRevoked  {
-                let rSection = InfoSection(header: localize("Reason for Invalidity"), content:localize( "Certificate has been revoked"))
+                let rSection = InfoSection(header: localize("Reason for Invalidity"),
+                    content:localize("The certificate has been revoked"))
                 infoSection += [rSection]
                 return
                 
@@ -217,6 +220,7 @@ public class DCCSectionBuilder {
                 return
             }
         }
+        
         let fullName = certificate.fullName
         if !fullName.isEmpty {
             let section = InfoSection(header: localize("Name"), content: fullName, style: .fixedWidthFont)
@@ -230,11 +234,11 @@ public class DCCSectionBuilder {
     }
 
     private func makeSectionsForRecovery(includeInvalidSection: Bool = true) {
+        let hSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString)
+        infoSection += [hSection]
         if includeInvalidSection {
-            let hSection = InfoSection(header: localize("Certificate Type"), content: certificate.certTypeString)
-            infoSection += [hSection]
             if validityState.isRevoked  {
-                let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("Certificate has been revoked"))
+                let rSection = InfoSection(header: localize("Reason for Invalidity"), content: localize("The certificate has been revoked"))
                 infoSection += [rSection]
                 return
                 
@@ -245,6 +249,7 @@ public class DCCSectionBuilder {
                 return
             }
         }
+        
         let fullName = certificate.fullName
         if !fullName.isEmpty {
             let nSection = InfoSection( header: localize("Name"), content: fullName, style: .fixedWidthFont)
