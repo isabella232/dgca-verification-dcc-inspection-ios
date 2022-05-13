@@ -38,6 +38,9 @@ public extension UIColor {
     static var verifierBlue: UIColor {
         UIColor(named: "verifierBlue", in: .module, compatibleWith: nil)!
     }
+    static var certificateBlue: UIColor {
+        UIColor(named: "certificateBlue", in: .module, compatibleWith: nil)!
+    }
     static var charcoalGrey: UIColor {
         UIColor(named: "charcoalGrey", in: .module, compatibleWith: nil)!
     }
