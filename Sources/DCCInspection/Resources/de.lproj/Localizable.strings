@@ -25,9 +25,6 @@
 
 */
 
-"HCertType.test" = "Testergebnis";
-"HCertType.vaccine" = "Impfung";
-"HCertType.recovery" = "Recovery";
 "Valid" = "Gültig";
 "Invalid" = "Ungültig";
 "Limited validity" = "Begrenzte Gültigkeit";

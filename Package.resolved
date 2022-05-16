@@ -78,7 +78,7 @@
         "repositoryURL": "https://github.com/eu-digital-green-certificates/dgca-verification-core-library-ios.git",
         "state": {
           "branch": "main",
-          "revision": "2934a0f21f65f19bea541e65e4486c5473cfadff",
+          "revision": "16689d86cc2fb2345919de069a55028c0f74cdc1",
           "version": null
         }
       },
@@ -132,8 +132,8 @@
         "repositoryURL": "https://github.com/tsolomko/SWCompression.git",
         "state": {
           "branch": null,
-          "revision": "4ad6940f2990f2d9f27b39d013c7a64b602d9c50",
-          "version": "4.8.0"
+          "revision": "0714d4421e1fa1e02af51cd8e615417a95f0d230",
+          "version": "4.8.1"
         }
       },
       {
