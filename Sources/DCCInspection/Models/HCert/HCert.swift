@@ -64,6 +64,10 @@ public class HCert: CertificationProtocol, Codable {
     public var lastNameStandardized: String {
         return get(.lastNameStandardized).string ?? ""
     }
+
+    public var certificateCreationDate: String {
+      return get(.certificateCreationDate).string ?? ""
+    }
     
     public var fullName: String {
         var fullName = ""
