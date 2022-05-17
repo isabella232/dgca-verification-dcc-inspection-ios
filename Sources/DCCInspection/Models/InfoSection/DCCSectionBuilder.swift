@@ -41,11 +41,10 @@ public class DCCSectionBuilder {
         
         if validity.isRevoked {
             self.makeRevocationSections()
+        } else if let section = validityState.infoSection {
+            self.makeSectionForRuleError(ruleSection: section, for: appType)
         } else {
             self.makeSections(for: appType)
-            if let section = validityState.infoSection {
-                self.makeSectionForRuleError(ruleSection: section, for: appType)
-            }
         }
     }
 
