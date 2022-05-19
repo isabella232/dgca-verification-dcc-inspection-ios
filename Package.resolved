@@ -59,9 +59,9 @@
         "package": "CertLogic",
         "repositoryURL": "https://github.com/eu-digital-green-certificates/dgc-certlogic-ios",
         "state": {
-          "branch": "feature/fixed-date-formatter",
-          "revision": "33f4d7e87d7a4ac24358434198911bd6affcd08d",
-          "version": null
+          "branch": null,
+          "revision": "448d9d4d1237cfe3cccfc05483ba12f339df883e",
+          "version": "1.3.2"
         }
       },
       {
