@@ -60,7 +60,7 @@
         "repositoryURL": "https://github.com/eu-digital-green-certificates/dgc-certlogic-ios",
         "state": {
           "branch": "feature/fixed-date-formatter",
-          "revision": "05be5ba7fe4c20d3e2b3b7decb61754991c3f7cb",
+          "revision": "33f4d7e87d7a4ac24358434198911bd6affcd08d",
           "version": null
         }
       },
@@ -78,7 +78,7 @@
         "repositoryURL": "https://github.com/eu-digital-green-certificates/dgca-verification-core-library-ios.git",
         "state": {
           "branch": "main",
-          "revision": "16689d86cc2fb2345919de069a55028c0f74cdc1",
+          "revision": "337c8e31afddcaf8512b7557c8ae4d6b3e139f03",
           "version": null
         }
       },
@@ -86,9 +86,9 @@
         "package": "JsonLogic",
         "repositoryURL": "https://github.com/eu-digital-green-certificates/json-logic-swift.git",
         "state": {
-          "branch": "feature/fix-date-formatter",
-          "revision": "7c2768dda013373b3440ed87be76ede9eb3e764e",
-          "version": null
+          "branch": null,
+          "revision": "3898636b43b62e571849790f74485dd1504ee785",
+          "version": "1.2.3"
         }
       },
       {
