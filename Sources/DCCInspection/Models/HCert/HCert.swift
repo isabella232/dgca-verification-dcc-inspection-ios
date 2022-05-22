@@ -66,7 +66,7 @@ public class HCert: CertificationProtocol, Codable {
     }
 
     public var certificateCreationDate: String {
-      return get(.certificateCreationDate).string ?? ""
+      return getCertificateCreationDate()
     }
     
     public var fullName: String {
@@ -234,6 +234,15 @@ public class HCert: CertificationProtocol, Codable {
         }
         return object
     }
+
+  private func getCertificateCreationDate() -> String {
+    if let testStatementObject = get(.testStatements).rawValue,
+       let testStatement = testStatementObject.first {
+      return testStatement["sc"].exists() ? testStatement["sc"] : ""
+    } else {
+      return ""
+    }
+  }
 }
 
 extension HCert {
