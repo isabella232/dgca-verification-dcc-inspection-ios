@@ -238,7 +238,6 @@ public class HCert: CertificationProtocol, Codable {
   private func getCertificateCreationDate() -> String {
     return iat.localDateString
     }
-  }
 }
 
 extension HCert {
