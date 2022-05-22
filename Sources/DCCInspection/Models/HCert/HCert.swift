@@ -236,8 +236,8 @@ public class HCert: CertificationProtocol, Codable {
     }
 
   private func getCertificateCreationDate() -> String {
-    if let testStatementObject = get(.testStatements).rawValue,
-       let testStatement = testStatementObject.first {
+    let testStatementObject = get(.testStatements).rawValue
+    if let testStatement = testStatementObject.first {
       return testStatement["sc"].exists() ? testStatement["sc"] : ""
     } else {
       return ""
