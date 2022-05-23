@@ -248,7 +248,7 @@ public class HCert: CertificationProtocol, Codable {
     if let certInfoObject = genericCertObject?.last {
       let creationDateString = get(.creationDate, inObject: certInfoObject).string ?? ""
       let creationDate = Date(dateString: creationDateString)
-      return creationDate.localDateString
+      return creationDate?.localDateString ?? ""
     } else {
       return ""
     }
