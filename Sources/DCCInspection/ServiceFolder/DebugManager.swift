@@ -38,7 +38,7 @@ public enum DebugLevel: Int {
 }
 
 public class DebugManager: NSObject {
-    static var sharedInstance: DebugManager = {
+    public static var sharedInstance: DebugManager = {
       let instance = DebugManager()
       return instance
     }()
