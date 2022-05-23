@@ -31,19 +31,19 @@ let debugKey = "UDDebugSwitchConstants"
 let logLevelKey = "UDLogLevelConstants"
 
 
-enum DebugLevel: Int {
+public enum DebugLevel: Int {
   case level1 = 0
   case level2
   case level3
 }
 
-class DebugManager: NSObject {
+public class DebugManager: NSObject {
     static var sharedInstance: DebugManager = {
       let instance = DebugManager()
       return instance
     }()
 
-    var isDebugMode: Bool {
+    public var isDebugMode: Bool {
         set {
           UserDefaults.standard.set(newValue, forKey: debugKey)
         }
@@ -52,7 +52,7 @@ class DebugManager: NSObject {
         }
     }
 
-    var debugLevel: DebugLevel {
+    public var debugLevel: DebugLevel {
         set {
           UserDefaults.standard.set(newValue.rawValue, forKey: logLevelKey)
         }
