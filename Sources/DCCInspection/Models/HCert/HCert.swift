@@ -233,7 +233,7 @@ public class HCert: CertificationProtocol, Codable {
     if let inObject = inObject {
       object = inObject
     } else {
-      inObject = body
+      object = body
     }
 
     if let object = inObject
