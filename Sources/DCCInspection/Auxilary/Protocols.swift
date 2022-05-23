@@ -39,3 +39,7 @@ public protocol HCertEntry {
     var uvci: String { get }
     var validityFailures: [String] { get }
 }
+
+public protocol DebuggingDelegate: AnyObject {
+    func debugControllerDidSelect(isDebugMode: Bool, level: DebugLevel)
+}
