@@ -237,7 +237,9 @@ public class HCert: CertificationProtocol, Codable {
     }
 
     for key in attributeKeys[attribute] ?? [] {
-      object = object[key]
+      if object[key].exists() {
+        object = object[key]
+      }
     }
     return object
   }
