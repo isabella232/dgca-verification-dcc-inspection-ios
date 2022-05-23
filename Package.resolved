@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/leif-ibsen/BigInt",
         "state": {
           "branch": null,
-          "revision": "3ff261ecd694009513cd0a260fc03723cc61d32e",
-          "version": "1.2.12"
+          "revision": "b840fe49dc816012c7fc9e975a9b5058a3b42bbc",
+          "version": "1.3.0"
         }
       },
       {
@@ -78,7 +78,7 @@
         "repositoryURL": "https://github.com/eu-digital-green-certificates/dgca-verification-core-library-ios.git",
         "state": {
           "branch": "main",
-          "revision": "337c8e31afddcaf8512b7557c8ae4d6b3e139f03",
+          "revision": "949d970da7880b5250bf03b579a6054ec45740e8",
           "version": null
         }
       },

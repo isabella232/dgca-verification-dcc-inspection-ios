@@ -57,21 +57,25 @@ class RevocationWorker {
             
             SecureKeyChain.save(key: "verifierETag", data: Data(etag.utf8))
             let (loadPartList, updatePartList) = self.processReviewRevocations(revocations)
-            
+            var errorOccured = false
             let group = DispatchGroup()
             group.enter()
             self.processDownloadNewRevocations(loadPartList) { err in
-                guard err == nil else { completion(err!); return }
+                if err != nil { errorOccured = true }
                 group.leave()
             }
             group.enter()
             self.processUpdateExistedRevocations(updatePartList) { err in
-                guard err == nil else { completion(err!); return }
+                if err != nil { errorOccured = true }
                 group.leave()
             }
             
             group.notify(queue: .main) {
-                completion(nil)
+                if errorOccured {
+                    completion(.failedLoading(reason: "Failed loading revocations"))
+                } else {
+                    completion(nil)
+                }
             }
         }
     }

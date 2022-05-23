@@ -43,7 +43,6 @@ public class HCert: CertificationProtocol, Codable {
     public var ruleCountryCode: String?
     public var isRevoked: Bool = false
     public let isUntrusted: Bool
-
     
     public var dateOfBirth: String {
         return get(.dateOfBirth).string ?? ""
@@ -180,9 +179,9 @@ public class HCert: CertificationProtocol, Codable {
 			fullPayloadString = copyPayload
 			payloadString = HCertConfig.parsePrefix(copyPayload)
 		} else {
-		  let supportedPrefix = HCertConfig.supportedPrefixes.first ?? ""
-		  fullPayloadString = supportedPrefix + copyPayload
-		  payloadString = copyPayload
+            let supportedPrefix = HCertConfig.supportedPrefixes.first ?? ""
+            fullPayloadString = supportedPrefix + copyPayload
+            payloadString = copyPayload
 		}
         
         self.ruleCountryCode = ruleCountryCode
@@ -227,34 +226,34 @@ public class HCert: CertificationProtocol, Codable {
         }
     }
     
-  private func get(_ attribute: AttributeKey, inObject: JSON? = nil) -> JSON {
-    var object: JSON = JSON.null
+    private func get(_ attribute: AttributeKey, inObject: JSON? = nil) -> JSON {
+        var object: JSON = JSON.null
 
-    if let inObject = inObject {
-      object = inObject
-    } else {
-      object = body
+        if let inObject = inObject {
+            object = inObject
+        } else {
+            object = body
+        }
+
+        for key in attributeKeys[attribute] ?? [] {
+            if object[key].exists() {
+                object = object[key]
+            }
+        }
+        return object
     }
 
-    for key in attributeKeys[attribute] ?? [] {
-      if object[key].exists() {
-        object = object[key]
-      }
-    }
-    return object
-  }
+    private func getCertificateCreationDate() -> String {
+        let genericCertObject = get(.genericCertObject).array
 
-  private func getCertificateCreationDate() -> String {
-    let genericCertObject = get(.genericCertObject).array
-
-    if let certInfoObject = genericCertObject?.last {
-      let creationDateString = get(.creationDate, inObject: certInfoObject).string ?? ""
-      let creationDate = Date(dateString: creationDateString)
-      return creationDate?.localDateString ?? ""
-    } else {
-      return ""
+        if let certInfoObject = genericCertObject?.last {
+            let creationDateString = get(.creationDate, inObject: certInfoObject).string ?? ""
+            let creationDate = Date(dateString: creationDateString)
+            return creationDate?.localDateString ?? ""
+        } else {
+            return ""
+        }
     }
-  }
 }
 
 extension HCert {
