@@ -227,7 +227,16 @@ public class HCert: CertificationProtocol, Codable {
         }
     }
     
-  private func get(_ attribute: AttributeKey, inObject: JSON = body) -> JSON {
+  private func get(_ attribute: AttributeKey, inObject: JSON? = nil) -> JSON {
+    var object: JSON = JSON.nullJSON
+
+    if let inObject = inObject {
+      object = inObject
+    } else {
+      inObject = body
+    }
+
+    if let object = inObject
         var object = inObject
         for key in attributeKeys[attribute] ?? [] {
             object = object[key]
