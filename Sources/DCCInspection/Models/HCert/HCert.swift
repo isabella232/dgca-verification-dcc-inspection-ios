@@ -239,7 +239,6 @@ public class HCert: CertificationProtocol, Codable {
     for key in attributeKeys[attribute] ?? [] {
       if object[key].exists() {
         object = object[key]
-        break
       }
     }
     return object
