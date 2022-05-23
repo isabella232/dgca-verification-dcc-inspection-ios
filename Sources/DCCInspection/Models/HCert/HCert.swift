@@ -228,7 +228,7 @@ public class HCert: CertificationProtocol, Codable {
     }
     
   private func get(_ attribute: AttributeKey, inObject: JSON? = nil) -> JSON {
-    var object: JSON = JSON.nullJSON
+    var object: JSON = JSON.null
 
     if let inObject = inObject {
       object = inObject
@@ -236,18 +236,16 @@ public class HCert: CertificationProtocol, Codable {
       object = body
     }
 
-    if let object = inObject
-        var object = inObject
-        for key in attributeKeys[attribute] ?? [] {
-            object = object[key]
-        }
-        return object
+    for key in attributeKeys[attribute] ?? [] {
+      object = object[key]
     }
+    return object
+  }
 
   private func getCertificateCreationDate() -> String {
     let genericCertObject = get(.genericCertObject).array
 
-    if let certInfoObject = genericCertObject.last {
+    if let certInfoObject = genericCertObject?.last {
       let creationDateString = get(.creationDate, inObject: certInfoObject).string ?? ""
       let creationDate = Date(dateString: creationDateString)
       return creationDate.localDateString
