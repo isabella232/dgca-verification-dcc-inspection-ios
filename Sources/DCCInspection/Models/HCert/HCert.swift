@@ -245,6 +245,7 @@ public class HCert: CertificationProtocol, Codable {
     } else {
       return ""
     }
+  }
 }
 
 extension HCert {
